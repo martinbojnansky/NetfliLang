@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Windows.System;
+using Windows.UI.ViewManagement;
 
 namespace NetfliLang.App.Views
 {
@@ -106,7 +107,7 @@ namespace NetfliLang.App.Views
                 await LogTitle();
                 titleIndex = titles.Count - 1;
 
-                if(titles.Count > 0)
+                if (titles.Count > 0)
                 {
                     await ShowTitle();
                 }
@@ -133,7 +134,7 @@ namespace NetfliLang.App.Views
 
                 if (!ViewModel.ShowTranslation)
                 {
-                    titleIndex = titles.Count - 1;       
+                    titleIndex = titles.Count - 1;
                 }
 
                 titleIndex--;
@@ -144,6 +145,50 @@ namespace NetfliLang.App.Views
             }
             catch { }
         }
+
+        private void NetflixWebview_ContainsFullScreenElementChanged(WebView sender, object args)
+        {
+            if (sender.ContainsFullScreenElement)
+            {
+                ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
+            } else
+            {
+                ApplicationView.GetForCurrentView().ExitFullScreenMode();
+            }
+        }
+
+        //private async void NetflixWebview_ScriptNotify(object sender, NotifyEventArgs e)
+        //{
+        //    try
+        //    {
+        //        switch (e.Value)
+        //        {
+        //            case "pause":
+        //                await LogTitle();
+        //                titleIndex = titles.Count - 1;
+
+        //                if (titles.Count > 0)
+        //                {
+        //                    await ShowTitle();
+        //                }
+        //                break;
+        //            case "play":
+        //                ViewModel.ShowTranslation = false;
+        //                break;
+        //        }
+        //    }
+        //    catch { }
+        //}
+
+        //private async void NetflixWebview_NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+        //{
+        //    try
+        //    {
+        //        // https://www.suchan.cz/2016/01/hacking-uwp-webview-part-2-bypassing-window-external-notify-whitelist/
+        //        await NetflixWebview.InvokeScriptAsync("function getVideo() { return document.querySelector('video'); } function start() { let prevVideo = document.querySelector('video'); setInterval(() => { const nextVideo = getVideo(); if (prevVideo !== nextVideo) { prevVideo = nextVideo; if (nextVideo) { nextVideo.addEventListener('play', () => { console.log('play'); window.external.notify('play'); }); nextVideo.addEventListener('pause', () => { console.log('pause'); window.external.notify('pause'); }); } } }, 500); } start(); window.external.notify('pause');");
+        //    }
+        //    catch { }
+        //}
     }
 
     public static class Extensions

@@ -14,7 +14,10 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        <WebView x:Name="NetflixWebview" Source="https://netflix.com" Grid.ColumnSpan="2"/>
+        <WebView x:Name="NetflixWebview" 
+                 Source="https://netflix.com" 
+                 Grid.ColumnSpan="2"
+                 ContainsFullScreenElementChanged="NetflixWebview_ContainsFullScreenElementChanged"/>
         <WebView x:Name="TranslatorWebview" Visibility="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}" Source="https://translate.google.com" Grid.Column="1" Width="320"/>
         <ToggleButton 
             IsChecked="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}"
@@ -23,7 +26,7 @@
             VerticalAlignment="Bottom"
             HorizontalAlignment="Left"
             Width="100" Height="100" RightTapped="ToggleButton_RightTapped">
-            </ToggleButton>
+        </ToggleButton>
         <!--<Button
             Content="Go to Settings Page"
             Click="{x:Bind ViewModel.NavigateToSettingsPage}"/>-->
