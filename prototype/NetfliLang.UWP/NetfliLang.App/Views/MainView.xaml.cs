@@ -15,28 +15,50 @@ namespace NetfliLang.App.Views
     {
         public MainViewModel ViewModel { get; set; } = ((App)Application.Current).MvvmLocator.ResolveViewModel<MainViewModel>();
 
+        public WebViewMessenger WebViewMessenger = new WebViewMessenger();
+
         public MainView()
         {
             InitializeComponent();
+
+            WebViewMessenger.NotificationReceived += WebViewMessenger_NotificationReceived;
         }
 
-        private void NetflixWebview_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
+        private void NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
-            NetflixWebview.AddWebAllowedObject(nameof(NetfliLang), new WebViewMessenger());
+            NetflixWebview.AddWebAllowedObject(nameof(NetfliLang), WebViewMessenger);
         }
 
-        private async void NetflixWebview_DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
+        private async void DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
         {
             try
             {
-                await NetflixWebview.InvokeScriptAsync($"{nameof(NetfliLang)}.sendNotification('xxx');");
+                await NetflixWebview.InvokeScriptAsync(@"
+                    let xhrOpen = window.XMLHttpRequest.prototype.open;
+
+                    window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
+                        this.addEventListener('load', function () {
+                            try {
+                                const parser = new DOMParser();
+                                const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
+                                const subtitles = Array.from(ttmlDoc.querySelectorAll('p')).map(p => p.textContent).join('|');
+                                if (subtitles) {
+                                    NetfliLang.sendNotification('SubtitlesLoaded', subtitles);
+                                }
+                            }
+                            catch(e) {}
+                        });
+
+                        return xhrOpen.apply(this, arguments);
+                    }                    
+                ");
             }
-            catch { }
+            catch(Exception ex) {
+            }
         }
 
-        private void ScriptNotify(object sender, NotifyEventArgs e)
+        private void WebViewMessenger_NotificationReceived(string action, string payload)
         {
-            Debug.WriteLine($"script: {e?.Value}");
         }
 
         private void ContainsFullScreenElementChanged(WebView sender, object args)

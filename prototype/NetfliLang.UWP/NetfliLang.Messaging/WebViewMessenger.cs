@@ -1,23 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Foundation.Metadata;
+﻿using Windows.Foundation.Metadata;
 
 namespace NetfliLang.Messaging
 {
-    public delegate void SendNotificationHandler(string notification);
+    public delegate void NotificationReceivedDelegate(string action, string payload);
 
     [AllowForWeb]
     public sealed class WebViewMessenger
     {
-        public event SendNotificationHandler SendNotificationEvent;
+        public event NotificationReceivedDelegate NotificationReceived;
 
-        public void sendNotification(string notification)
+        public void sendNotification(string action, string payload)
         {
-            Debug.WriteLine($"notification: {notification}");
+            NotificationReceived?.Invoke(action, payload);
         }
     }
 }

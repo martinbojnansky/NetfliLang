@@ -129,6 +129,12 @@
       <Version>6.2.3</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetfliLang.Core\NetfliLang.Core.csproj">
+      <Project>{F11D3D58-6B31-4E40-9944-02D1E77DDAF8}</Project>
+      <Name>NetfliLang.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
