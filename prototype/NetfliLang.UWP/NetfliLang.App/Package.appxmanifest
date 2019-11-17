@@ -20,9 +20,6 @@
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
-      <uap:ApplicationContentUriRules>
-        <uap:Rule Match="https://netflix.com" Type="include" WindowsRuntimeAccess="none" />
-      </uap:ApplicationContentUriRules>
     </Application>
   </Applications>
   <Capabilities>

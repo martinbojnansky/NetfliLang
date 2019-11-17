@@ -17,18 +17,11 @@
         <WebView x:Name="NetflixWebview" 
                  Source="https://netflix.com" 
                  Grid.ColumnSpan="2"
-                 ContainsFullScreenElementChanged="NetflixWebview_ContainsFullScreenElementChanged"/>
+                 NavigationStarting="NetflixWebview_NavigationStarting"
+                 DOMContentLoaded="NetflixWebview_DOMContentLoaded"
+                 ScriptNotify="ScriptNotify"
+                 ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
+                 />
         <WebView x:Name="TranslatorWebview" Visibility="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}" Source="https://translate.google.com" Grid.Column="1" Width="320"/>
-        <ToggleButton 
-            IsChecked="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}"
-            Checked="ToggleButton_Checked"
-            Unchecked="ToggleButton_Unchecked"
-            VerticalAlignment="Bottom"
-            HorizontalAlignment="Left"
-            Width="100" Height="100" RightTapped="ToggleButton_RightTapped">
-        </ToggleButton>
-        <!--<Button
-            Content="Go to Settings Page"
-            Click="{x:Bind ViewModel.NavigateToSettingsPage}"/>-->
     </Grid>
 </navigation:NavigationPage>
