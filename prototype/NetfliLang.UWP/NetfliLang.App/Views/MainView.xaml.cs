@@ -42,7 +42,7 @@ namespace NetfliLang.App.Views
                                 const parser = new DOMParser();
                                 const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
                                 const subtitles = Array.from(ttmlDoc.querySelectorAll('p')).map(p => p.textContent).join('|');
-                                if (subtitles) {
+                                if (subtitles && window.location.href.includes('netflix.com/watch')) {
                                     NetfliLang.sendNotification('SubtitlesLoaded', subtitles);
                                 }
                             }
@@ -53,13 +53,20 @@ namespace NetfliLang.App.Views
                     }                    
                 ");
             }
-            catch(Exception ex) {
+            catch {
             }
         }
 
-        private void WebViewMessenger_NotificationReceived(string action, string payload)
+        private async void WebViewMessenger_NotificationReceived(string action, string payload)
         {
-        }
+            try
+            {
+                var subtitles = payload.Replace("'", "\'");
+                await TranslatorWebview.InvokeScriptAsync($"document.querySelector('#source').value = '{subtitles}'");
+                ViewModel.ShowTranslation = true;           
+            }
+            catch { }
+            }
 
         private void ContainsFullScreenElementChanged(WebView sender, object args)
         {

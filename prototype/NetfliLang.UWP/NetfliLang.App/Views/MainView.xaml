@@ -21,6 +21,10 @@
                  DOMContentLoaded="DOMContentLoaded"
                  ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
                  />
-        <WebView x:Name="TranslatorWebview" Visibility="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}" Source="https://translate.google.com" Grid.Column="1" Width="320"/>
+        <WebView 
+            x:Name="TranslatorWebview" 
+            Visibility="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}" 
+            Source="https://translate.google.com" 
+            Grid.Column="1" Width="320"/>
     </Grid>
 </navigation:NavigationPage>
