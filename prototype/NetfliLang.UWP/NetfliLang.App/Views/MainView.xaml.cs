@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Windows.UI.ViewManagement;
 using NetfliLang.Messaging;
+using System.IO;
+using System.Reflection;
 
 namespace NetfliLang.App.Views
 {
@@ -33,27 +35,10 @@ namespace NetfliLang.App.Views
         {
             try
             {
-                await NetflixWebview.InvokeScriptAsync(@"
-                    let xhrOpen = window.XMLHttpRequest.prototype.open;
-
-                    window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
-                        this.addEventListener('load', function () {
-                            try {
-                                const parser = new DOMParser();
-                                const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-                                const subtitles = Array.from(ttmlDoc.querySelectorAll('p')).map(p => p.textContent).join('|');
-                                if (subtitles && window.location.href.includes('netflix.com/watch')) {
-                                    NetfliLang.sendNotification('SubtitlesLoaded', subtitles);
-                                }
-                            }
-                            catch(e) {}
-                        });
-
-                        return xhrOpen.apply(this, arguments);
-                    }                    
-                ");
+                var js = GetJavascriptFile("main.js");
+                await NetflixWebview.InvokeScriptAsync(js);
             }
-            catch {
+            catch (Exception ex) {
             }
         }
 
@@ -76,6 +61,15 @@ namespace NetfliLang.App.Views
             } else
             {
                 ApplicationView.GetForCurrentView().ExitFullScreenMode();
+            }
+        }
+
+        private string GetJavascriptFile(string fileName)
+        {
+            var names = typeof(App).GetTypeInfo().Assembly.GetManifestResourceNames();
+            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"UWPToolkit.Template.Scripts.{fileName}")))
+            {
+                return reader.ReadToEnd();
             }
         }
     }

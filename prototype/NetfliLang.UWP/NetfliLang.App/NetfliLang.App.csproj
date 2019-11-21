@@ -121,6 +121,7 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <EmbeddedResource Include="Scripts\main.js" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -137,7 +138,6 @@
     <Folder Include="Controls\" />
     <Folder Include="Converters\" />
     <Folder Include="Models\" />
-    <Folder Include="Scripts\" />
     <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
