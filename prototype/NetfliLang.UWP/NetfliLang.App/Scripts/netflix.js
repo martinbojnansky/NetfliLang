@@ -1,6 +1,6 @@
 ﻿var nlSubtitles;
 var nlStyle;
-var nlSpeed = 0.8;
+var nlSpeed = 0.7;
 
 var xhrOpen = window.XMLHttpRequest.prototype.open;
 window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
