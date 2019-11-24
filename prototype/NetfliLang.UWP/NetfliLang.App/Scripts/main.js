@@ -11,7 +11,6 @@ window.XMLHttpRequest.prototype.open = function (method, url, async, user, passw
             const parser = new DOMParser();
             const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
             nlSubtitles = parseSubtitles(ttmlDoc);
-            console.log(nlSubtitles);
             createSubtitlesStyle();
         }
         catch (e) {
@@ -22,24 +21,24 @@ window.XMLHttpRequest.prototype.open = function (method, url, async, user, passw
     return xhrOpen.apply(this, arguments);
 };
 
-let insertedNodes;
-let observer = new WebKitMutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        insertedNodes = [];
-        for (var i = 0; i < mutation.addedNodes.length; i++)
-            insertedNodes.push(mutation.addedNodes[i]);
+let observer = new WebKitMutationObserver(mutations => {
+    mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(addedNode => {
+            if (addedNode.classList.contains('player-timedtext-text-container')) {
+                updateSubtitles(addedNode.textContent);
+            } else {
+                setSpeed();
+            }
+        }
+        );
     });
-    
-    // TODO: If video, apply speed "video"
-    setSpeed();
-    // TODO: If subtitles, show translation and translate next ".player-timedtext"
+
 });
+
 observer.observe(document, {
     childList: true,
     subtree: true
 });
-
-// https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
 
 function getVideo() {
     return document.querySelector('video');
@@ -49,7 +48,11 @@ function setSpeed() {
     trySafe(() => getVideo().playbackRate = nlSpeed);
 }
 
-function updateTranslation()
+function updateSubtitles(key) {
+    console.log(
+        'show: ' + nlSubtitles[key].lines.join() + '\n translate: ' + nlSubtitles[key].occurences[0].next
+    );
+}
 
 function createSubtitlesStyle() {
     if (!nlStyle) {
