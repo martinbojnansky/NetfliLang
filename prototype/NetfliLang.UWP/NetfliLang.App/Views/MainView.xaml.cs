@@ -10,6 +10,8 @@ using Windows.UI.ViewManagement;
 using NetfliLang.Messaging;
 using System.IO;
 using System.Reflection;
+using NetfliLang.Core.Storage;
+using UWPToolkit.Template.Models;
 
 namespace NetfliLang.App.Views
 {
@@ -26,32 +28,24 @@ namespace NetfliLang.App.Views
             WebViewMessenger.NotificationReceived += WebViewMessenger_NotificationReceived;
         }
 
-        private void NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
+        #region Netflix
+
+        private void NetflixWebview_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
             NetflixWebview.AddWebAllowedObject(nameof(NetfliLang), WebViewMessenger);
         }
 
-        private async void DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
+        private async void NetflixWebview_DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
         {
             try
             {
-                var js = GetJavascriptFile("main.js");
+                var js = GetJavascriptFile("netflix.js");
                 await NetflixWebview.InvokeScriptAsync(js);
             }
             catch (Exception ex) {
             }
         }
 
-        private async void WebViewMessenger_NotificationReceived(string action, string payload)
-        {
-            try
-            {
-                var subtitles = payload.Replace("'", "\'");
-                await TranslatorWebview.InvokeScriptAsync($"document.querySelector('#source').value = '{subtitles}'");
-                ViewModel.ShowTranslation = true;           
-            }
-            catch { }
-            }
 
         private void ContainsFullScreenElementChanged(WebView sender, object args)
         {
@@ -62,6 +56,52 @@ namespace NetfliLang.App.Views
             {
                 ApplicationView.GetForCurrentView().ExitFullScreenMode();
             }
+        }
+
+        #endregion
+
+        #region Gtranslate
+
+        private void TranslatorWebview_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
+        {
+            TranslatorWebview.AddWebAllowedObject(nameof(NetfliLang), WebViewMessenger);
+        }
+
+        private async void TranslatorWebview_DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
+        {
+            try
+            {
+                var js = GetJavascriptFile("gtranslator.js");
+                await TranslatorWebview.InvokeScriptAsync(js);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        #endregion
+
+        private async void WebViewMessenger_NotificationReceived(string action, string payload)
+        {
+            try
+            {
+                var serializer = new JsonSerializer();
+
+                switch (action)
+                {
+                    case "translate":
+                        var translateAction = serializer.FromJson<TranslateAction>(payload);
+                        await TranslatorWebview.InvokeScriptAsync($"translate('{string.Join("|", translateAction.lines).EscapeString()}');");
+                        break;
+                    case "translated":
+                        var translatedAction = serializer.FromJson<TranslatedAction>(payload);
+                        var onTranslated = $"translationReceived('{translatedAction.value.Replace("|", "").EscapeString()}', { serializer.ToJson(translatedAction.translation.Split('|')).EscapeString()})";
+                        await NetflixWebview.InvokeScriptAsync(onTranslated);     
+                        break;
+                }
+                 
+            }
+            catch { }
         }
 
         private string GetJavascriptFile(string fileName)
@@ -86,6 +126,11 @@ namespace NetfliLang.App.Views
             {
                 return ex.Message;
             }
+        }
+
+        public static string EscapeString(this string text)
+        {
+            return text.Replace("'", "\'");
         }
     }
 }

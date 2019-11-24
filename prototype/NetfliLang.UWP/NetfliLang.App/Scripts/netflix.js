@@ -1,8 +1,8 @@
-﻿let nlSubtitles;
-let nlStyle;
-let nlSpeed = 0.7;
+﻿var nlSubtitles;
+var nlStyle;
+var nlSpeed = 0.8;
 
-let xhrOpen = window.XMLHttpRequest.prototype.open;
+var xhrOpen = window.XMLHttpRequest.prototype.open;
 window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
     this.addEventListener('load', function () {
         try {
@@ -21,18 +21,21 @@ window.XMLHttpRequest.prototype.open = function (method, url, async, user, passw
     return xhrOpen.apply(this, arguments);
 };
 
-let observer = new WebKitMutationObserver(mutations => {
+var observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
         mutation.addedNodes.forEach(addedNode => {
-            if (addedNode.classList.contains('player-timedtext-text-container')) {
-                updateSubtitles(addedNode.textContent);
-            } else {
-                setSpeed();
+            try {
+                if (addedNode.classList.contains('player-timedtext-text-container')) {
+                    updateSubtitles(addedNode.textContent);
+                } else {
+                    setSpeed();
+                }
+            } catch (e) {
+                //
             }
         }
         );
     });
-
 });
 
 observer.observe(document, {
@@ -49,16 +52,40 @@ function setSpeed() {
 }
 
 function updateSubtitles(key) {
-    console.log(
-        'show: ' + nlSubtitles[key].lines.join() + '\n translate: ' + nlSubtitles[key].occurences[0].next
-    );
+    try {
+        // Show current
+        const currentTitles = nlSubtitles[key];
+        updateSubtitlesStyle(currentTitles.translations); // TODO: Use translations instead
+        // Translate next
+        const nextKey = currentTitles.occurences[0].next;
+        const nextTitles = nlSubtitles[nextKey];
+        NetfliLang.sendNotification('translate', JSON.stringify({ key: nextKey, lines: nextTitles.lines }));
+    } catch (e) {
+        //
+    }
+}
+
+function translationReceived(key, translations) {
+    try {
+        nlSubtitles[key].translations = translations;
+        console.log(nlSubtitles[key]);
+    } catch (e) {
+        //
+    }
 }
 
 function createSubtitlesStyle() {
     if (!nlStyle) {
         nlStyle = document.createElement('style');
         nlStyle.type = 'text/css';
-        nlStyle.innerHTML = `
+        document.head.insertAdjacentElement('beforeend', nlStyle);
+    }
+
+    updateSubtitles([]);
+}
+
+function updateSubtitlesStyle(translations) {
+    var style = `
             .player-timedtext span {
                 display: block;
                 color: yellow !important;
@@ -69,10 +96,10 @@ function createSubtitlesStyle() {
             }
 
             .player-timedtext span:before {
-                content: '...';                
+                content: '';                
                 display: block;
                 color: white;
-                font-size: 25px;
+                font-size: 2.5rem;
                 line-height: normal;
                 font-weight: normal;
                 color: #ffffff;
@@ -85,8 +112,16 @@ function createSubtitlesStyle() {
                 margin-top: 4px;
             }
         `;
-        document.head.insertAdjacentElement('beforeend', nlStyle);
+    if (translations) {
+        translations.forEach((translation, index) => {
+            style += `.player-timedtext span:nth-child(` + (index + 1) + `):before {
+            content: '` + translation + `';
+        }`;
+        });
     }
+
+    nlStyle.innerHTML = style;
+
 }
 
 function parseSubtitles(ttmlDoc) {
@@ -101,7 +136,7 @@ function parseSubtitles(ttmlDoc) {
             subtitles[key] = {
                 occurences: [occurence],
                 lines: lines,
-                translations: null
+                translations: []
             };
         } else {
             subtitles[key].occurences.push(occurence);

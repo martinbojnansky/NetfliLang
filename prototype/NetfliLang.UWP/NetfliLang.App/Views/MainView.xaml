@@ -17,13 +17,15 @@
         <WebView x:Name="NetflixWebview" 
                  Source="https://netflix.com" 
                  Grid.ColumnSpan="2"
-                 NavigationStarting="NavigationStarting"
-                 DOMContentLoaded="DOMContentLoaded"
+                 NavigationStarting="NetflixWebview_NavigationStarting"
+                 DOMContentLoaded="NetflixWebview_DOMContentLoaded"
                  ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
                  />
         <WebView 
             x:Name="TranslatorWebview" 
-            Visibility="{x:Bind ViewModel.ShowTranslation, Mode=OneWay}" 
+            NavigationStarting="TranslatorWebview_NavigationStarting"
+            DOMContentLoaded="TranslatorWebview_DOMContentLoaded"
+            Visibility="Collapsed" 
             Source="https://translate.google.com" 
             Grid.Column="1" Width="320"/>
     </Grid>
