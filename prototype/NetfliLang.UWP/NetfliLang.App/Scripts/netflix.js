@@ -95,7 +95,7 @@ function updateSubtitlesStyle(translations) {
                 display: none;
             }
 
-            .player-timedtext span:before {
+            .player-timedtext span::after {
                 content: '';                
                 display: block;
                 color: white;
@@ -108,13 +108,13 @@ function updateSubtitlesStyle(translations) {
                 font-weight: bold;
             }
 
-            .player-timedtext span:not(:first-child):before {
-                margin-top: 4px;
+            .player-timedtext span:not(:last-child)::after {
+                margin-bottom: 4px;
             }
         `;
     if (translations) {
         translations.forEach((translation, index) => {
-            style += `.player-timedtext span:nth-child(` + (index + 1) + `):before {
+            style += `.player-timedtext span:nth-child(` + (index + 1) + `)::after {
             content: '` + translation + `';
         }`;
         });
@@ -132,7 +132,7 @@ function parseSubtitles(ttmlDoc) {
         const nextKey = index < elements.length - 1 ? elements[index + 1].textContent : null;
         const occurence = parseOccurence(element, tickRate, nextKey);
         if (!subtitles[key]) {
-            const lines = Array.from(element.querySelectorAll('span')).map(s => s.textContent);
+            const lines = element.innerHTML.split(/<br[^>]*>/).map(s => s.replace(new RegExp(/<[^>]*>/, 'g'), ''));
             subtitles[key] = {
                 occurences: [occurence],
                 lines: lines,
