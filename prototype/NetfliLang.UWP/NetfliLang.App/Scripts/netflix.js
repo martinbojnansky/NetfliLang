@@ -1,6 +1,6 @@
 ﻿var nlSubtitles;
 var nlStyle;
-var nlSpeed = 0.7;
+var nlSpeed = 1;
 
 var xhrOpen = window.XMLHttpRequest.prototype.open;
 window.XMLHttpRequest.prototype.open = function (method, url, async, user, password) {
@@ -47,7 +47,11 @@ function getVideo() {
     return document.querySelector('video');
 }
 
-function setSpeed() {
+function setSpeed(speed) {
+    if (speed) {
+        nlSpeed = speed;
+    }
+
     trySafe(() => getVideo().playbackRate = nlSpeed);
 }
 
@@ -104,7 +108,7 @@ function updateSubtitlesStyle(translations) {
                 font-weight: normal;
                 color: #ffffff;
                 text-shadow: #000000 0px 0px 7px;
-                font-family: Netflix Sans,Helvetica Nueue,Helvetica,Arial,sans-serif;
+                font-family: Netflix Sans, Helvetica Nueue, Helvetica, Arial, sans-serif;
                 font-weight: bold;
             }
 

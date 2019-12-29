@@ -4,7 +4,6 @@
             try {
                 if (addedNode.classList.contains('tlid-result')) {
                     const action = { value: document.querySelector('#source').value, translation: Array.from(document.querySelectorAll('.tlid-result .tlid-translation')).map(r => r.textContent).join() };
-                    console.log(action);
                     NetfliLang.sendNotification('translated', JSON.stringify(action));
                 }
             } catch (e) {

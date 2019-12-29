@@ -14,9 +14,12 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
         <WebView x:Name="NetflixWebview" 
-                 Source="https://netflix.com" 
-                 Grid.ColumnSpan="2"
+                 Source="https://netflix.com"
                  NavigationStarting="NetflixWebview_NavigationStarting"
                  DOMContentLoaded="NetflixWebview_DOMContentLoaded"
                  ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
@@ -25,8 +28,12 @@
             x:Name="TranslatorWebview" 
             NavigationStarting="TranslatorWebview_NavigationStarting"
             DOMContentLoaded="TranslatorWebview_DOMContentLoaded"
-            Visibility="Collapsed" 
+            Visibility="{x:Bind ViewModel.IsTranslatorVisible, Mode=OneWay}" 
             Source="https://translate.google.com" 
             Grid.Column="1" Width="320"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="2">
+            <Slider Value="{x:Bind ViewModel.PlaybackSpeed, Mode=TwoWay}" StepFrequency="0.05" Minimum="0.4" Maximum="1" ValueChanged="Slider_ValueChanged" Width="200" Margin="0,0,40,0"></Slider>
+            <ToggleSwitch IsOn="{x:Bind ViewModel.IsTranslatorVisible, Mode=TwoWay}" OnContent="Show Translator" OffContent="Show Translator" Margin="0,0,40,0"></ToggleSwitch>
+        </StackPanel>
     </Grid>
 </navigation:NavigationPage>

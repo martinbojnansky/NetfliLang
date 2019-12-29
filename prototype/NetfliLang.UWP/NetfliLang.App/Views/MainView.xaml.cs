@@ -112,6 +112,15 @@ namespace NetfliLang.App.Views
                 return reader.ReadToEnd();
             }
         }
+
+        private async void Slider_ValueChanged(object sender, Windows.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            try
+            {
+                await NetflixWebview.InvokeScriptAsync($"setSpeed({ViewModel.PlaybackSpeed})");
+            }
+            catch { }
+        }
     }
 
     public static class Extensions
