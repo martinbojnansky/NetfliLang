@@ -28,10 +28,12 @@ export class GTranslatorService extends TranslatorService {
     }
 
     protected onNodeAdded = (node: Node, key: number, parent: NodeList) => {
-        if ((node as HTMLDivElement).classList.contains('tlid-result')) {
-            const action = { value: this.sourceText, translation: this.resultText };
-            NetfliLang.sendNotification('translated', JSON.stringify(action));
-        }
+        try {
+            if ((node as HTMLDivElement).classList.contains('tlid-result')) {
+                const action = { value: this.sourceText, translation: this.resultText };
+                NetfliLang.sendNotification('translated', JSON.stringify(action));
+            }
+        } catch {}
     }
 
     public translate(value: string) {

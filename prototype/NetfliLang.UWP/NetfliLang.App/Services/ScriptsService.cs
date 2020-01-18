@@ -19,7 +19,7 @@ namespace UWPToolkit.Template.Services
         public string ReadJavascriptResourceFile(string fileName)
         {
             var names = typeof(App).GetTypeInfo().Assembly.GetManifestResourceNames();
-            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"UWPToolkit.Template.Scripts.{fileName}")))
+            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Scripts.{fileName}")))
             {
                 return reader.ReadToEnd();
             }

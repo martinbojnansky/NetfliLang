@@ -21,7 +21,7 @@ namespace NetfliLang.App.ViewModels
         public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ScriptsService.ReadJavascriptResourceFile("netflix.js");
 
         private string _gTranslatorExtensionScript;
-        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("_js.translator.js");
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("js.require.js") + " " + ScriptsService.ReadJavascriptResourceFile("js.translator.js");
 
         private bool _isTranslatorVisible = false;
         public bool IsTranslatorVisible
