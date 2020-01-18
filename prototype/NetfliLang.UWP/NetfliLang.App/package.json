@@ -1,0 +1,19 @@
+{
+  "name": "typescript",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc -t es6 -m amd Scripts/translator.ts --out Scripts/_js/translator.js"
+  },
+  "devDependencies": {
+    "typescript": "3.8.0-dev.20200118"
+  },
+  "dependencies": {
+    "requirejs": "2.3.6"
+  },
+  "-vs-binding": {
+    "BeforeBuild": [
+      "build"
+    ]
+  }
+}

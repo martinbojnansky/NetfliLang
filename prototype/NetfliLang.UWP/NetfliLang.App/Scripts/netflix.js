@@ -125,7 +125,6 @@ function updateSubtitlesStyle(translations) {
     }
 
     nlStyle.innerHTML = style;
-
 }
 
 function parseSubtitles(ttmlDoc) {

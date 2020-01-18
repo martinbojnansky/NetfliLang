@@ -21,7 +21,7 @@ namespace NetfliLang.App.ViewModels
         public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ScriptsService.ReadJavascriptResourceFile("netflix.js");
 
         private string _gTranslatorExtensionScript;
-        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("gtranslator.js");
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("_js.translator.js");
 
         private bool _isTranslatorVisible = false;
         public bool IsTranslatorVisible
@@ -58,7 +58,7 @@ namespace NetfliLang.App.ViewModels
             {
                 case "translate":
                     var translateAction = JsonSerializer.FromJson<TranslateAction>(payload);
-                    GTranslateWebViewMessenger.InvokeScript($"translate('{string.Join("|||", translateAction.lines).EscapeJavascript()}');");
+                    GTranslateWebViewMessenger.InvokeScript($"translator.translate('{string.Join("|||", translateAction.lines).EscapeJavascript()}');");
                     break;
             }
         }
