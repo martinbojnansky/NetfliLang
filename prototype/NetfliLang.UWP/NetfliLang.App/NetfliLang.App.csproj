@@ -95,10 +95,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ExtendedWebView.xaml.cs">
+      <DependentUpon>ExtendedWebView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Extensions\JavascriptExtensions.cs" />
     <Compile Include="IoC\IoCContainer.cs" />
     <Compile Include="Models\TranslatedAction.cs" />
     <Compile Include="Models\TranslateAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ScriptsService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
@@ -138,11 +143,13 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controls\" />
     <Folder Include="Converters\" />
-    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\ExtendedWebView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\SettingsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

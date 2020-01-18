@@ -6,34 +6,37 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:navigation="using:NetfliLang.Core.Navigation"
+    xmlns:controls="using:UWPToolkit.Template.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="13*"/>
+            <ColumnDefinition Width="3*" MinWidth="320"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <WebView x:Name="NetflixWebview" 
-                 Source="https://netflix.com"
-                 NavigationStarting="NetflixWebview_NavigationStarting"
-                 DOMContentLoaded="NetflixWebview_DOMContentLoaded"
-                 ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
-                 />
-        <WebView 
-            x:Name="TranslatorWebview" 
-            NavigationStarting="TranslatorWebview_NavigationStarting"
-            DOMContentLoaded="TranslatorWebview_DOMContentLoaded"
-            Visibility="{x:Bind ViewModel.IsTranslatorVisible, Mode=OneWay}" 
-            Source="https://translate.google.com" 
-            Grid.Column="1" Width="320"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="1" Grid.ColumnSpan="2">
-            <Slider Value="{x:Bind ViewModel.PlaybackSpeed, Mode=TwoWay}" StepFrequency="0.05" Minimum="0.4" Maximum="1" ValueChanged="Slider_ValueChanged" Width="200" Margin="0,0,40,0"></Slider>
-            <ToggleSwitch IsOn="{x:Bind ViewModel.IsTranslatorVisible, Mode=TwoWay}" OnContent="Show Translator" OffContent="Show Translator" Margin="0,0,40,0"></ToggleSwitch>
+        <!-- netflix webview -->
+        <controls:ExtendedWebView
+            Grid.ColumnSpan="2"
+            Source="https://netflix.com/"
+            ExtensionScript="{x:Bind ViewModel.NetflixExtensionScript}"
+            WebViewMessenger="{x:Bind ViewModel.NetflixWebViewMessenger}">
+        </controls:ExtendedWebView>
+        <!-- gtranslator webview -->
+        <controls:ExtendedWebView
+            Grid.Column="1"
+            Source="https://translate.google.com/"
+            ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
+            WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
+            Visibility="{x:Bind ViewModel.IsTranslatorVisible, Mode=OneWay}">
+        </controls:ExtendedWebView>
+        <!-- toolbar -->
+        <StackPanel  Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <ToggleSwitch IsOn="{x:Bind ViewModel.IsTranslatorVisible, Mode=TwoWay}" OnContent="Translator" OffContent="Translator" Margin="0,0,40,0"></ToggleSwitch>
         </StackPanel>
     </Grid>
 </navigation:NavigationPage>

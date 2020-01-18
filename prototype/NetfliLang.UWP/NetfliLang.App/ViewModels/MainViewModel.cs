@@ -1,49 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NetfliLang.App.Views;
+﻿using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
+using NetfliLang.Messaging;
+using System.Text.RegularExpressions;
+using UWPToolkit.Template.Extensions;
+using UWPToolkit.Template.Models;
+using UWPToolkit.Template.Services;
+using Windows.UI.Xaml.Navigation;
 
 namespace NetfliLang.App.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        public ILocalObjectStorage LocalObjectStorage;
+        public ILocalObjectStorage LocalObjectStorage { get; set; }
+        public IJsonSerializer JsonSerializer { get; set; }
+        public IScriptsService ScriptsService { get; set; }
+        public IWebViewMessenger NetflixWebViewMessenger { get; set; }
+        public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
+
+        private string _netflixExtensionScript;
+        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ScriptsService.ReadJavascriptResourceFile("netflix.js");
+
+        private string _gTranslatorExtensionScript;
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("gtranslator.js");
 
         private bool _isTranslatorVisible = false;
-
         public bool IsTranslatorVisible
         {
             get => _isTranslatorVisible;
-            set {
+            set
+            {
                 _isTranslatorVisible = value;
                 RaisePropertyChanged();
             }
         }
 
-        private double _playbackSpeed = 1.0;
-        public double PlaybackSpeed
+        public MainViewModel() { }
+
+        public override void OnNavigatedTo(NavigationEventArgs e)
         {
-            //get {
-            //    try { return LocalObjectStorage.GetValue<double>(nameof(PlaybackSpeed)); }
-            //    catch { return 1; }
-            //}
-            //set
-            //{
-            //    try
-            //    {
-            //        LocalObjectStorage.SetValue(nameof(PlaybackSpeed), value);
-            //        RaisePropertyChanged();
-            //    }
-            //    catch { }
-            //}
-            get => _playbackSpeed;
-            set
+            NetflixWebViewMessenger.NotificationReceived += NetflixNotificationReceived;
+            GTranslateWebViewMessenger.NotificationReceived += GTranslateNotificationReceived;
+
+            base.OnNavigatedTo(e);
+        }
+
+        public override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
+            GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
+
+            base.OnNavigatedFrom(e);
+        }
+
+        protected void NetflixNotificationReceived(string action, string payload)
+        {
+            switch (action)
             {
-                _playbackSpeed = value;
-                RaisePropertyChanged();
+                case "translate":
+                    var translateAction = JsonSerializer.FromJson<TranslateAction>(payload);
+                    GTranslateWebViewMessenger.InvokeScript($"translate('{string.Join("|||", translateAction.lines).EscapeJavascript()}');");
+                    break;
+            }
+        }
+
+        protected void GTranslateNotificationReceived(string action, string payload)
+        {
+            switch (action)
+            {
+                case "translated":
+                    var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
+                    var onTranslated = $"translationReceived('{translatedAction.value.Replace("|||", "").EscapeJavascript()}', { JsonSerializer.ToJson(Regex.Split(translatedAction.translation, @"\|\|\|")).EscapeJavascript()})";
+                    NetflixWebViewMessenger.InvokeScript(onTranslated);
+                    break;
             }
         }
 
