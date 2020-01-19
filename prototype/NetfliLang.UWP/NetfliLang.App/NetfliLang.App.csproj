@@ -7,8 +7,8 @@
     <ProjectGuid>{B8332FD5-C526-414B-BEF1-C9106155C673}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UWPToolkit.Template</RootNamespace>
-    <AssemblyName>UWPToolkit.Template</AssemblyName>
+    <RootNamespace>NetfliLang.App</RootNamespace>
+    <AssemblyName>NetfliLang.App</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.17763.0</TargetPlatformVersion>
@@ -128,8 +128,9 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <EmbeddedResource Include="Scripts\gtranslator.js" />
-    <EmbeddedResource Include="Scripts\netflix.js" />
+    <EmbeddedResource Include="Scripts\js\require.js" />
+    <EmbeddedResource Include="Scripts\js\translator.js" />
+    <EmbeddedResource Include="Scripts\js\netflix.js" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
+    <Folder Include="Scripts\models\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\ExtendedWebView.xaml">
@@ -168,6 +170,17 @@
       <Project>{422641A7-A6C8-4459-9829-7B06CBA805A7}</Project>
       <Name>NetfliLang.Messaging</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\helpers\notifications.ts" />
+    <TypeScriptCompile Include="Scripts\services\mutation-observer.service.ts" />
+    <TypeScriptCompile Include="Scripts\services\netflix.service.ts" />
+    <TypeScriptCompile Include="Scripts\services\translator.service.ts" />
+    <TypeScriptCompile Include="Scripts\translator.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="package-lock.json" />
+    <None Include="package.json" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
