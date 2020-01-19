@@ -39,11 +39,10 @@ define("services/mutation-observer.service", ["require", "exports"], function (r
 define("helpers/notifications", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    function sendNotification(action, payload) {
+    exports.sendNotification = function (action, payload) {
         // @ts-ignore
         NetfliLang.sendNotification(action, payload);
-    }
-    exports.sendNotification = sendNotification;
+    };
 });
 define("services/translator.service", ["require", "exports", "services/mutation-observer.service", "helpers/notifications"], function (require, exports, mutation_observer_service_1, notifications_1) {
     "use strict";
@@ -61,10 +60,13 @@ define("services/translator.service", ["require", "exports", "services/mutation-
         function GTranslatorService() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.onNodeAdded = function (node, key, parent) {
-                if (node.classList.contains('tlid-result')) {
-                    var action = { value: _this.sourceText, translation: _this.resultText };
-                    notifications_1.sendNotification('translated', JSON.stringify(action));
+                try {
+                    if (node.classList.contains('tlid-result')) {
+                        var action = { value: _this.sourceText, translation: _this.resultText };
+                        notifications_1.sendNotification('translated', JSON.stringify(action));
+                    }
                 }
+                catch (_a) { }
             };
             return _this;
         }

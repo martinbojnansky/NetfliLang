@@ -130,7 +130,7 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <EmbeddedResource Include="Scripts\js\require.js" />
     <EmbeddedResource Include="Scripts\js\translator.js" />
-    <EmbeddedResource Include="Scripts\netflix.js" />
+    <EmbeddedResource Include="Scripts\js\netflix.js" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

@@ -30,12 +30,20 @@ namespace UWPToolkit.Template.Services
             scriptBuilder.AppendLine($"// {fileName}");
             scriptBuilder.Append(ReadJavascriptResourceFile(fileName));
 
+            if (dependencies.Contains("require.js"))
+            {
+                var fileNameParts = fileName.Split('.');
+                var scriptName = fileNameParts[fileNameParts.Length - 2];
+                scriptBuilder.AppendLine($"var {scriptName};");
+                scriptBuilder.AppendLine($"requirejs(['{scriptName}'], module => {{ {scriptName} = module.{scriptName}; }})");
+            }
+
             return scriptBuilder.ToString();
         }
 
         protected string ReadJavascriptResourceFile(string fileName)
         {
-            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Scripts.{fileName}")))
+            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Scripts.js.{fileName}")))
             {
                 return reader.ReadToEnd();
             }
