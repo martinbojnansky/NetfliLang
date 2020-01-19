@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build-translator",
-    "build-translator": "tsc -t es5 -m amd Scripts/translator.ts --out Scripts/js/translator.js"
+    "build": "npm run build-translator && npm run build-netflix",
+    "build-translator": "tsc -t es5 -m amd Scripts/translator.ts --out Scripts/js/translator.js",
+    "build-netflix": "tsc -t es5 -m amd Scripts/netflix.ts --out Scripts/js/netflix.js"
   },
   "devDependencies": {
     "typescript": "3.8.0-dev.20200118"
