@@ -23,7 +23,7 @@ define("services/mutation-observer.service", ["require", "exports"], function (r
             this.observer = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     if (_this.onNodeAdded) {
-                        mutation.addedNodes.forEach(_this.onNodeAdded);
+                        mutation.addedNodes.forEach(function (value, key, parent) { return _this.onNodeAdded(value, key, parent); });
                     }
                 });
             });
@@ -36,21 +36,16 @@ define("services/mutation-observer.service", ["require", "exports"], function (r
     }());
     exports.MutationObserverService = MutationObserverService;
 });
-define("helpers/try-safe", ["require", "exports"], function (require, exports) {
+define("helpers/notifications", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    function trySafe(fce) {
-        try {
-            fce();
-        }
-        catch (e) {
-            console.log(e);
-            return null;
-        }
+    function sendNotification(action, payload) {
+        // @ts-ignore
+        NetfliLang.sendNotification(action, payload);
     }
-    exports.trySafe = trySafe;
+    exports.sendNotification = sendNotification;
 });
-define("services/translator.service", ["require", "exports", "services/mutation-observer.service", "../models/netfli-lang", "helpers/try-safe"], function (require, exports, mutation_observer_service_1, netfli_lang_1, try_safe_1) {
+define("services/translator.service", ["require", "exports", "services/mutation-observer.service", "helpers/notifications"], function (require, exports, mutation_observer_service_1, notifications_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TranslatorService = /** @class */ (function (_super) {
@@ -64,40 +59,34 @@ define("services/translator.service", ["require", "exports", "services/mutation-
     var GTranslatorService = /** @class */ (function (_super) {
         __extends(GTranslatorService, _super);
         function GTranslatorService() {
-            var _this = _super.call(this) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.onNodeAdded = function (node, key, parent) {
-                try {
-                    if (node.classList.contains('tlid-result')) {
-                        var action = { value: _this.sourceText, translation: _this.resultText };
-                        netfli_lang_1.default.sendNotification('translated', JSON.stringify(action));
-                    }
+                if (node.classList.contains('tlid-result')) {
+                    var action = { value: _this.sourceText, translation: _this.resultText };
+                    notifications_1.sendNotification('translated', JSON.stringify(action));
                 }
-                catch (_a) { }
             };
             return _this;
         }
         Object.defineProperty(GTranslatorService.prototype, "source", {
             get: function () {
-                return try_safe_1.trySafe(function () { return document.querySelector('#source'); });
+                return document.querySelector('#source');
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(GTranslatorService.prototype, "sourceText", {
             get: function () {
-                var _this = this;
-                return try_safe_1.trySafe(function () { return _this.source.value; });
+                return this.source.value;
             },
             enumerable: true,
             configurable: true
         });
         Object.defineProperty(GTranslatorService.prototype, "resultText", {
             get: function () {
-                return try_safe_1.trySafe(function () {
-                    var result = '';
-                    document.querySelectorAll('.tlid-result .tlid-translation').forEach(function (r) { return result += r.textContent; });
-                    return result;
-                });
+                var result = '';
+                document.querySelectorAll('.tlid-result .tlid-translation').forEach(function (r) { return result += r.textContent; });
+                return result;
             },
             enumerable: true,
             configurable: true
@@ -112,5 +101,5 @@ define("services/translator.service", ["require", "exports", "services/mutation-
 define("translator", ["require", "exports", "services/translator.service"], function (require, exports, translator_service_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var translator = new translator_service_1.GTranslatorService();
+    exports.translator = new translator_service_1.GTranslatorService();
 });

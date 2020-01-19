@@ -1,3 +1,3 @@
 import { GTranslatorService, TranslatorService } from "./services/translator.service";
 
-const translator: TranslatorService = new GTranslatorService();
+export const translator: TranslatorService = new GTranslatorService();

@@ -9,7 +9,7 @@ export abstract class MutationObserverService {
         this.observer = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 if (this.onNodeAdded) {
-                    mutation.addedNodes.forEach(this.onNodeAdded)
+                    mutation.addedNodes.forEach((value, key, parent) => this.onNodeAdded(value, key, parent))
                 }
             });
         });

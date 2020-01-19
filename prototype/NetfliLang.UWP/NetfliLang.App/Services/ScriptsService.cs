@@ -11,14 +11,30 @@ namespace UWPToolkit.Template.Services
 {
     public interface IScriptsService
     {
-        string ReadJavascriptResourceFile(string fileName);
+        string ReadJavascriptResourceFile(string fileName, params string[] dependencies);
     }
 
     public class ScriptsService: IScriptsService
     {
-        public string ReadJavascriptResourceFile(string fileName)
+        public string ReadJavascriptResourceFile(string fileName, params string[] dependencies)
         {
-            var names = typeof(App).GetTypeInfo().Assembly.GetManifestResourceNames();
+            var scriptBuilder = new StringBuilder();
+
+            foreach (var dependency in dependencies)
+            {
+                scriptBuilder.AppendLine($"// {dependency}");
+                scriptBuilder.Append(ReadJavascriptResourceFile(dependency));
+                scriptBuilder.AppendLine();
+            }
+
+            scriptBuilder.AppendLine($"// {fileName}");
+            scriptBuilder.Append(ReadJavascriptResourceFile(fileName));
+
+            return scriptBuilder.ToString();
+        }
+
+        protected string ReadJavascriptResourceFile(string fileName)
+        {
             using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Scripts.{fileName}")))
             {
                 return reader.ReadToEnd();

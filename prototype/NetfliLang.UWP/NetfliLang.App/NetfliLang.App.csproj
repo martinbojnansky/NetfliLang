@@ -145,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converters\" />
+    <Folder Include="Scripts\models\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\ExtendedWebView.xaml">
@@ -171,11 +172,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\helpers\try-safe.ts" />
+    <TypeScriptCompile Include="Scripts\helpers\notifications.ts" />
     <TypeScriptCompile Include="Scripts\services\mutation-observer.service.ts" />
+    <TypeScriptCompile Include="Scripts\services\netflix.service.ts" />
     <TypeScriptCompile Include="Scripts\services\translator.service.ts" />
     <TypeScriptCompile Include="Scripts\translator.ts" />
-    <TypeScriptCompile Include="Scripts\models\netfli-lang.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="package-lock.json" />
