@@ -4,10 +4,14 @@ export interface ISubtitleOccurence {
     next: string;
 }
 
-export interface ISubtitles {
-    [key: string]: {
-        occurences: ISubtitleOccurence[];
-        lines: string[];
-        translations: string[];
-    };
+export interface ISubtitle {
+    key: string;
+    occurences: ISubtitleOccurence[];
+    lines: string[];
+    translations: string[];
 }
+
+export interface ISubtitles {
+    [key: string]: ISubtitle;
+}
+

@@ -66,7 +66,9 @@ define("services/translator.service", ["require", "exports", "services/mutation-
                         notifications_1.sendNotification('translated', JSON.stringify(action));
                     }
                 }
-                catch (_a) { }
+                catch (e) {
+                    console.log(e);
+                }
             };
             return _this;
         }
