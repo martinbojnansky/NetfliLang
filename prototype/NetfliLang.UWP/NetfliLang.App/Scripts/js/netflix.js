@@ -48,28 +48,67 @@ define("models/subtitles", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("services/netflix.service", ["require", "exports", "services/mutation-observer.service", "helpers/notifications"], function (require, exports, mutation_observer_service_1, notifications_1) {
+define("services/subtitles-parser.service", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SubtitlesParserService = /** @class */ (function () {
+        function SubtitlesParserService() {
+        }
+        SubtitlesParserService.prototype.parseSubtitles = function (ttmlDoc) {
+            var _this = this;
+            var tickRate = Number(ttmlDoc.querySelector('tt').getAttribute('ttp:tickRate'));
+            var subtitles = {};
+            ttmlDoc.querySelectorAll('p').forEach(function (element, index, elements) {
+                var key = element.textContent;
+                var nextKey = index < elements.length - 1 ? elements[index + 1].textContent : null;
+                var occurence = _this.parseOccurence(element, tickRate, nextKey);
+                if (!subtitles[key]) {
+                    var lines = element.innerHTML.split(/<br[^>]*>/).map(function (s) { return s.replace(new RegExp("/<[^>]*>/", 'g'), ''); });
+                    subtitles[key] = {
+                        key: key,
+                        occurences: [occurence],
+                        lines: lines,
+                        translations: []
+                    };
+                }
+                else {
+                    subtitles[key].occurences.push(occurence);
+                }
+            });
+            return subtitles;
+        };
+        SubtitlesParserService.prototype.parseOccurence = function (element, tickRate, nextKey) {
+            return {
+                start: Number(element.getAttribute('begin').replace('t', '')) / tickRate,
+                end: Number(element.getAttribute('end').replace('t', '')) / tickRate,
+                next: nextKey
+            };
+        };
+        return SubtitlesParserService;
+    }());
+    exports.SubtitlesParserService = SubtitlesParserService;
+});
+define("services/netflix.service", ["require", "exports", "services/mutation-observer.service", "helpers/notifications", "services/subtitles-parser.service"], function (require, exports, mutation_observer_service_1, notifications_1, subtitles_parser_service_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NetflixService = /** @class */ (function (_super) {
         __extends(NetflixService, _super);
         function NetflixService() {
-            var _this_1 = _super.call(this) || this;
-            _this_1.speed = 1;
+            var _this_1 = _super !== null && _super.apply(this, arguments) || this;
             _this_1.onNodeAdded = function (node, key, parent) {
                 try {
                     if (node.classList.contains('player-timedtext-text-container')) {
-                        _this_1.updateSubtitles(node.textContent);
+                        _this_1.onSubtitleDisplayed(node.textContent);
                     }
                 }
                 catch (e) {
                     console.log(e);
                 }
             };
-            _this_1.initInterceptor();
             return _this_1;
         }
-        NetflixService.prototype.initInterceptor = function () {
+        NetflixService.prototype.init = function () {
+            _super.prototype.init.call(this);
             var _this = this;
             // @ts-ignore
             var xhrOpen = window.XMLHttpRequest.prototype.open;
@@ -82,100 +121,63 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
                             return;
                         var parser = new DOMParser();
                         var ttmlDoc = parser.parseFromString(_this_1.responseText, 'text/xml');
-                        _this.subtitles = _this.parseSubtitles(ttmlDoc);
-                        _this.createSubtitlesStyle();
+                        _this.subtitles = (new subtitles_parser_service_1.SubtitlesParserService()).parseSubtitles(ttmlDoc);
+                        _this.createSubtitlesStyleElement();
                     }
-                    catch (e) {
-                        console.log(e);
-                    }
+                    catch (_a) { }
                 });
                 return xhrOpen.apply(this, arguments);
             };
         };
-        // TODO: On node removed -> auto pause video
-        NetflixService.prototype.getVideo = function () {
-            return document.querySelector('video');
-        };
-        NetflixService.prototype.setSpeed = function (speed) {
-            if (speed) {
-                this.speed = speed;
-            }
-            try {
-                this.getVideo().playbackRate = this.speed;
-            }
-            catch (e) {
-                console.log(e);
-            }
-        };
-        // TODO: Require set speed from app
-        // TODO: On seek to previouse
-        NetflixService.prototype.updateSubtitles = function (key) {
-            try {
-                // Show current
-                var currentTitles = this.subtitles[key];
-                this.updateSubtitlesStyle(currentTitles.translations);
-                // Translate next
-                var nextKey = currentTitles.occurences[0].next;
-                var nextTitles = this.subtitles[nextKey];
-                notifications_1.sendNotification('translate', JSON.stringify({ key: nextKey, lines: nextTitles.lines }));
-            }
-            catch (e) {
-                console.log(e);
-            }
-        };
-        NetflixService.prototype.translationReceived = function (key, translations) {
-            try {
-                this.subtitles[key].translations = translations;
-            }
-            catch (e) {
-                console.log(e);
-            }
-        };
-        NetflixService.prototype.createSubtitlesStyle = function () {
+        NetflixService.prototype.createSubtitlesStyleElement = function () {
             if (!this.style) {
                 this.style = document.createElement('style');
                 this.style.type = 'text/css';
                 document.head.insertAdjacentElement('beforeend', this.style);
             }
-            this.updateSubtitles([]);
         };
         NetflixService.prototype.updateSubtitlesStyle = function (translations) {
             var style = "\n            .player-timedtext span {\n                display: block;\n                color: yellow !important;\n            }\n\n            .player-timedtext span > br {\n                display: none;\n            }\n\n            .player-timedtext span::after {\n                content: '';                \n                display: block;\n                color: white;\n                font-size: 2.5rem;\n                line-height: normal;\n                font-weight: normal;\n                color: #ffffff;\n                text-shadow: #000000 0px 0px 7px;\n                font-family: Netflix Sans, Helvetica Nueue, Helvetica, Arial, sans-serif;\n                font-weight: bold;\n            }\n\n            .player-timedtext span:not(:last-child)::after {\n                margin-bottom: 4px;\n            }\n        ";
             if (translations) {
                 translations.forEach(function (translation, index) {
-                    style += ".player-timedtext span:nth-child(" + (index + 1) + ")::after {\n            content: '" + translation + "';\n        }";
+                    style += ".player-timedtext span:nth-child(" + (index + 1) + ")::after {\n                    content: '" + translation + "';\n                }";
                 });
             }
             this.style.innerHTML = style;
         };
-        NetflixService.prototype.parseSubtitles = function (ttmlDoc) {
-            var _this_1 = this;
-            var tickRate = Number(ttmlDoc.querySelector('tt').getAttribute('ttp:tickRate'));
-            var subtitles = {};
-            ttmlDoc.querySelectorAll('p').forEach(function (element, index, elements) {
-                var key = element.textContent;
-                var nextKey = index < elements.length - 1 ? elements[index + 1].textContent : null;
-                var occurence = _this_1.parseOccurence(element, tickRate, nextKey);
-                if (!subtitles[key]) {
-                    var lines = element.innerHTML.split(/<br[^>]*>/).map(function (s) { return s.replace(new RegExp("/<[^>]*>/", 'g'), ''); });
-                    subtitles[key] = {
-                        occurences: [occurence],
-                        lines: lines,
-                        translations: []
-                    };
-                }
-                else {
-                    subtitles[key].occurences.push(occurence);
-                }
-            });
-            return subtitles;
+        NetflixService.prototype.onSubtitleDisplayed = function (key) {
+            try {
+                this.showSubtitleTranslation(key);
+                document.querySelector('video').pause(); // TODO: Improve auto-pause
+                this.translateNextSubtitle(key);
+            }
+            catch (e) {
+                console.log(e);
+            }
         };
-        NetflixService.prototype.parseOccurence = function (element, tickRate, nextKey) {
-            return {
-                start: Number(element.getAttribute('begin').replace('t', '')) / tickRate,
-                end: Number(element.getAttribute('end').replace('t', '')) / tickRate,
-                next: nextKey
-            };
+        NetflixService.prototype.showSubtitleTranslation = function (key) {
+            var subtitle = this.subtitles[key];
+            if (!subtitle.translations.length) {
+                this.translateSubtitle(subtitle);
+            }
+            this.updateSubtitlesStyle(subtitle.translations);
+        };
+        NetflixService.prototype.translateNextSubtitle = function (key) {
+            var nextKey = this.subtitles[key].occurences[0].next; // TODO: Find next occurence based on time
+            var next = this.subtitles[nextKey];
+            this.translateSubtitle(next);
+        };
+        NetflixService.prototype.translateSubtitle = function (subtitle) {
+            notifications_1.sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+        };
+        NetflixService.prototype.translationReceived = function (key, translations) {
+            if (this.subtitles.hasOwnProperty(key)) {
+                this.subtitles[key].translations = translations;
+                var currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
+                if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
+                    this.updateSubtitlesStyle(key);
+                }
+            }
         };
         return NetflixService;
     }(mutation_observer_service_1.MutationObserverService));

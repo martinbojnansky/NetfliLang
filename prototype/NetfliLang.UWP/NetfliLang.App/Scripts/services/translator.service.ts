@@ -26,7 +26,7 @@ export class GTranslatorService extends TranslatorService {
                 const action = { value: this.sourceText, translation: this.resultText };
                 sendNotification('translated', JSON.stringify(action));
             }
-        } catch { }
+        } catch (e) { console.log(e); }
     }
 
     public translate(value: string) {
