@@ -23,7 +23,7 @@ namespace NetfliLang.App.ViewModels
         private string _gTranslatorExtensionScript;
         public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("translator.js", "require.js");
 
-        private bool _isTranslatorVisible = false;
+        private bool _isTranslatorVisible = true;
         public bool IsTranslatorVisible
         {
             get => _isTranslatorVisible;

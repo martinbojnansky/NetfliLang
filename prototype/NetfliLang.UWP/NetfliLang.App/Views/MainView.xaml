@@ -13,7 +13,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="3*" MinWidth="320"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -21,7 +21,6 @@
         </Grid.RowDefinitions>
         <!-- netflix webview -->
         <controls:ExtendedWebView
-            Grid.ColumnSpan="2"
             Source="https://netflix.com/"
             ExtensionScript="{x:Bind ViewModel.NetflixExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.NetflixWebViewMessenger}">
@@ -32,6 +31,7 @@
             Source="https://translate.google.com/"
             ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
+            Width="320"
             Visibility="{x:Bind ViewModel.IsTranslatorVisible, Mode=OneWay}">
         </controls:ExtendedWebView>
         <!-- toolbar -->

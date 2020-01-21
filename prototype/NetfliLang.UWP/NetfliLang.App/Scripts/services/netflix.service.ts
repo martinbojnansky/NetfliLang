@@ -5,7 +5,16 @@ import { SubtitlesParserService } from "./subtitles-parser.service";
 
 export class NetflixService extends MutationObserverService {
     protected subtitles: ISubtitles;
+
+    protected get video(): HTMLVideoElement {
+        return document.querySelector('video');
+    }
+
     protected style: HTMLStyleElement;
+
+    protected autoPause: boolean = true;
+    protected autoPauseOn: number;
+    protected lastAutoPauseOn: number;
 
     protected init(): void {
         super.init();
@@ -31,8 +40,11 @@ export class NetflixService extends MutationObserverService {
 
     protected onNodeAdded = (node: Node, key: number, parent: NodeList) => {
         try {
-            if ((node as HTMLDivElement).classList.contains('player-timedtext-text-container')) {
+            const div = node as HTMLDivElement;
+            if (div.classList.contains('player-timedtext-text-container')) {
                 this.onSubtitleDisplayed(node.textContent);
+            } else if (div.classList.contains('nfp') && div.classList.contains('AkiraPlayer') && this.video) {
+                this.video.ontimeupdate = () => this.onTimeUpdated();
             }
         } catch (e) { console.log(e); }
     }
@@ -88,17 +100,22 @@ export class NetflixService extends MutationObserverService {
     protected onSubtitleDisplayed(key: string): void {
         try {
             this.showSubtitleTranslation(key);
-            document.querySelector('video').pause(); // TODO: Improve auto-pause
             this.translateNextSubtitle(key);
         } catch (e) { console.log(e); }
     }
 
     protected showSubtitleTranslation(key: string): void {
         const subtitle = this.subtitles[key];
-        if (!subtitle.translations.length) {
-            this.translateSubtitle(subtitle);
-        }
+
+        //if (!subtitle.translations.length) {
+        //    this.translateSubtitle(subtitle);
+        //}
+
         this.updateSubtitlesStyle(subtitle.translations);
+
+        if (this.autoPause) {
+            this.autoPauseOn = subtitle.occurences[0].end; // TODO: Find next occurence based on time
+        }
     }
 
     protected translateNextSubtitle(key: string): void {
@@ -108,17 +125,34 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected translateSubtitle(subtitle: ISubtitle): void {
-        sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+        if (!subtitle.translations.length) {
+            sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+        }
     }
 
     protected translationReceived(key: string, translations: string[]): void {
         if (this.subtitles.hasOwnProperty(key)) {
             this.subtitles[key].translations = translations;
 
-            const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
-            if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
-                this.updateSubtitlesStyle(key);
-            }
+            //const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
+            //if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
+            //    this.updateSubtitlesStyle([translations]);
+            //}
+        }
+    }
+
+    protected onTimeUpdated(): void {
+        if (!this.autoPause || !this.video || !this.autoPauseOn) return;
+
+        const time = this.video.currentTime;
+        const isEndingSoon = time >= this.autoPauseOn - 0.25 && time <= this.autoPauseOn;
+        const wasNotPausedAlready = this.autoPauseOn !== this.lastAutoPauseOn;
+        if (time && isEndingSoon && wasNotPausedAlready) {
+            this.lastAutoPauseOn = this.autoPauseOn;
+            const pauseIn = (this.autoPauseOn - time) * 1000 - 100;
+            setTimeout(() => {
+                document.querySelector('.button-nfplayerPause').dispatchEvent(new Event('click'));
+            }, pauseIn);
         }
     }
 }

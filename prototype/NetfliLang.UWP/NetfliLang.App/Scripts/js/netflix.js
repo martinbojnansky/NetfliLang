@@ -63,7 +63,7 @@ define("services/subtitles-parser.service", ["require", "exports"], function (re
                 var nextKey = index < elements.length - 1 ? elements[index + 1].textContent : null;
                 var occurence = _this.parseOccurence(element, tickRate, nextKey);
                 if (!subtitles[key]) {
-                    var lines = element.innerHTML.split(/<br[^>]*>/).map(function (s) { return s.replace(new RegExp("/<[^>]*>/", 'g'), ''); });
+                    var lines = element.innerHTML.split(/<br[^>]*>/).map(function (s) { return s.replace(/<[^>]*>/g, ''); });
                     subtitles[key] = {
                         key: key,
                         occurences: [occurence],
@@ -95,10 +95,15 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
         __extends(NetflixService, _super);
         function NetflixService() {
             var _this_1 = _super !== null && _super.apply(this, arguments) || this;
+            _this_1.autoPause = true;
             _this_1.onNodeAdded = function (node, key, parent) {
                 try {
-                    if (node.classList.contains('player-timedtext-text-container')) {
+                    var div = node;
+                    if (div.classList.contains('player-timedtext-text-container')) {
                         _this_1.onSubtitleDisplayed(node.textContent);
+                    }
+                    else if (div.classList.contains('nfp') && div.classList.contains('AkiraPlayer') && _this_1.video) {
+                        _this_1.video.ontimeupdate = function () { return _this_1.onTimeUpdated(); };
                     }
                 }
                 catch (e) {
@@ -107,6 +112,13 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
             };
             return _this_1;
         }
+        Object.defineProperty(NetflixService.prototype, "video", {
+            get: function () {
+                return document.querySelector('video');
+            },
+            enumerable: true,
+            configurable: true
+        });
         NetflixService.prototype.init = function () {
             _super.prototype.init.call(this);
             var _this = this;
@@ -148,7 +160,6 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
         NetflixService.prototype.onSubtitleDisplayed = function (key) {
             try {
                 this.showSubtitleTranslation(key);
-                document.querySelector('video').pause(); // TODO: Improve auto-pause
                 this.translateNextSubtitle(key);
             }
             catch (e) {
@@ -157,10 +168,13 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
         };
         NetflixService.prototype.showSubtitleTranslation = function (key) {
             var subtitle = this.subtitles[key];
-            if (!subtitle.translations.length) {
-                this.translateSubtitle(subtitle);
-            }
+            //if (!subtitle.translations.length) {
+            //    this.translateSubtitle(subtitle);
+            //}
             this.updateSubtitlesStyle(subtitle.translations);
+            if (this.autoPause) {
+                this.autoPauseOn = subtitle.occurences[0].end; // TODO: Find next occurence based on time
+            }
         };
         NetflixService.prototype.translateNextSubtitle = function (key) {
             var nextKey = this.subtitles[key].occurences[0].next; // TODO: Find next occurence based on time
@@ -168,15 +182,33 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
             this.translateSubtitle(next);
         };
         NetflixService.prototype.translateSubtitle = function (subtitle) {
-            notifications_1.sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+            if (!subtitle.translations.length) {
+                notifications_1.sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+            }
         };
         NetflixService.prototype.translationReceived = function (key, translations) {
             if (this.subtitles.hasOwnProperty(key)) {
                 this.subtitles[key].translations = translations;
-                var currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
-                if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
-                    this.updateSubtitlesStyle(key);
-                }
+                //const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
+                //if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
+                //    this.updateSubtitlesStyle([translations]);
+                //}
+            }
+        };
+        NetflixService.prototype.onTimeUpdated = function () {
+            var _this_1 = this;
+            if (!this.autoPause || !this.video || !this.autoPauseOn)
+                return;
+            var time = this.video.currentTime;
+            var isEndingSoon = time >= this.autoPauseOn - 0.25 && time <= this.autoPauseOn;
+            var wasNotPausedAlready = this.autoPauseOn !== this.lastAutoPauseOn;
+            if (time && isEndingSoon && wasNotPausedAlready) {
+                this.lastAutoPauseOn = this.autoPauseOn;
+                var pauseIn = (this.autoPauseOn - time) * 1000;
+                setTimeout(function () {
+                    document.querySelector('.button-nfplayerPause').dispatchEvent(new Event('click'));
+                    _this_1.video.currentTime = _this_1.autoPauseOn;
+                }, pauseIn);
             }
         };
         return NetflixService;

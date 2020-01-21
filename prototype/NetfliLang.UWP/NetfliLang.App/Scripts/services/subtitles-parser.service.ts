@@ -11,7 +11,7 @@ export class SubtitlesParserService {
             const occurence = this.parseOccurence(element, tickRate, nextKey);
 
             if (!subtitles[key]) {
-                const lines = element.innerHTML.split(/<br[^>]*>/).map(s => s.replace(new RegExp("/<[^>]*>/", 'g'), ''));
+                const lines = element.innerHTML.split(/<br[^>]*>/).map(s => s.replace(/<[^>]*>/g, ''));
                 subtitles[key] = {
                     key: key,
                     occurences: [occurence],
