@@ -196,7 +196,6 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
             }
         };
         NetflixService.prototype.onTimeUpdated = function () {
-            var _this_1 = this;
             if (!this.autoPause || !this.video || !this.autoPauseOn)
                 return;
             var time = this.video.currentTime;
@@ -204,10 +203,9 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
             var wasNotPausedAlready = this.autoPauseOn !== this.lastAutoPauseOn;
             if (time && isEndingSoon && wasNotPausedAlready) {
                 this.lastAutoPauseOn = this.autoPauseOn;
-                var pauseIn = (this.autoPauseOn - time) * 1000;
+                var pauseIn = (this.autoPauseOn - time) * 1000 - 100;
                 setTimeout(function () {
                     document.querySelector('.button-nfplayerPause').dispatchEvent(new Event('click'));
-                    _this_1.video.currentTime = _this_1.autoPauseOn;
                 }, pauseIn);
             }
         };
