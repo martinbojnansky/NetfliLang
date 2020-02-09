@@ -32,7 +32,7 @@
     <Compile Include="Storage\RoamingObjectStorage.cs" />
     <Compile Include="Storage\LocalObjectStorage.cs" />
     <Compile Include="Storage\XmlSerializer.cs" />
-    <Compile Include="ViewManagement\AppBar.cs" />
+    <Compile Include="ViewManagement\TitleBar.cs" />
     <Compile Include="Storage\JsonSerializer.cs" />
     <Compile Include="Storage\ObjectStorageBase.cs" />
     <Compile Include="ViewModel\PropertyChangedBase.cs" />

@@ -8,18 +8,18 @@ using Windows.UI.ViewManagement;
 
 namespace NetfliLang.Core.ViewManagement
 {
-    public interface IAppBar
+    public interface ITitleBar
     {
-        void CustomizeDesktopAppBar(Action<ApplicationViewTitleBar> func);
+        void CustomizeDesktopTitleBar(Action<ApplicationViewTitleBar> func);
 
-        void CustomizeMobileAppBar(Action<StatusBar> func);
+        void CustomizeMobileTitleBar(Action<StatusBar> func);
     }
 
-    public class AppBar : IAppBar
+    public class TitleBar : ITitleBar
     {
         #region Desktop & Tablet
 
-        public void CustomizeDesktopAppBar(Action<ApplicationViewTitleBar> func)
+        public void CustomizeDesktopTitleBar(Action<ApplicationViewTitleBar> func)
         {
             if (ApiInformation.IsTypePresent(typeof(ApplicationView).FullName))
             {
@@ -36,7 +36,7 @@ namespace NetfliLang.Core.ViewManagement
 
         #region Mobile 
 
-        public void CustomizeMobileAppBar(Action<StatusBar> func)
+        public void CustomizeMobileTitleBar(Action<StatusBar> func)
         {
             if (ApiInformation.IsTypePresent(typeof(StatusBar).FullName))
             {
@@ -49,7 +49,7 @@ namespace NetfliLang.Core.ViewManagement
             }
         }
 
-        public async Task ShowMobileAppBarAsync()
+        public async Task ShowMobileTitleBarAsync()
         {
             if (ApiInformation.IsTypePresent(typeof(StatusBar).FullName))
             {
@@ -58,7 +58,7 @@ namespace NetfliLang.Core.ViewManagement
             }
         }
 
-        public async Task HideMobileAppBarAsync()
+        public async Task HideMobileTitleBarAsync()
         {
             if (ApiInformation.IsTypePresent(typeof(StatusBar).FullName))
             {

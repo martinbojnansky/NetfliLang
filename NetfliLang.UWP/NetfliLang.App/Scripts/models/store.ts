@@ -1,4 +1,4 @@
-export class Store<TState extends object> {
+export class Store<TState> {
     protected _state: TState;
 
     public get state(): TState {
@@ -10,6 +10,6 @@ export class Store<TState extends object> {
     }
 
     public patch(patch: Partial<TState>): void {
-        this._state = Object.assign(this._state, patch);
+        this._state = <TState>{ ...<any>this._state, ...<any>patch };
     }
 }
