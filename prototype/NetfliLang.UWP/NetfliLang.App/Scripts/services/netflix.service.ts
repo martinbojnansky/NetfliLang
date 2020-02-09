@@ -131,8 +131,8 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected translationReceived(value: string, translation: string): void {
-        const key = value.replace(/<[^>]*>/g, '');
-        const translations = translation.replace(/\s*<[^>]*>\s*(?!\s*<)/g, '').split(/\s*<[^>]*>\s*/g);
+        const key = value.replace(/\|\|\|/g, '');
+        const translations = translation.split(/\s*\|\|\|\s*/g);
 
         if (this.subtitles.hasOwnProperty(key)) {
             this.subtitles[key].translations = translations;
