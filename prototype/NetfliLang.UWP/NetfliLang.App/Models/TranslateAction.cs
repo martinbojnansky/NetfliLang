@@ -11,9 +11,6 @@ namespace UWPToolkit.Template.Models
     public class TranslateAction
     {
         [DataMember]
-        public string key { get; set; }
-
-        [DataMember]
-        public string[] lines { get; set; }
+        public string value { get; set; }
     }
 }
