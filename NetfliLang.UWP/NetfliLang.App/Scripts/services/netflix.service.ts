@@ -132,12 +132,12 @@ export class NetflixService extends MutationObserverService {
 
     protected translateSubtitle(subtitle: ISubtitle): void {
         if (!subtitle.translations.length) {
-            sendNotification('translate', JSON.stringify({ value: `<p>${subtitle.lines.join('</p><p>')}</p>` }));
+            sendNotification('translate', JSON.stringify({ value: subtitle.lines.join(' ||| ') }));
         }
     }
 
     protected translationReceived(value: string, translation: string): void {
-        const key = value.replace(/\|\|\|/g, '');
+        const key = value.replace(/\s\|\|\|\s/g, '');
         const translations = translation.split(/\s*\|\|\|\s*/g);
 
         if (this.subtitles.hasOwnProperty(key)) {
