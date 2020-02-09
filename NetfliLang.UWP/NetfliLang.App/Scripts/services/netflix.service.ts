@@ -4,14 +4,16 @@ import { ISubtitles, ISubtitle } from "../models/subtitles";
 import { SubtitlesParserService } from "./subtitles-parser.service";
 import { Store } from "../models/store";
 
+export interface INetflixServiceState {
+    subtitles: ISubtitles,
+    autoPause: false | {
+        next: number,
+        last: number
+    }
+}
+
 export class NetflixService extends MutationObserverService {
-    protected store = new Store<{
-        subtitles: ISubtitles,
-        autoPause: false | {
-            next: number,
-            last: number
-        }
-    }>({
+    protected store = new Store<INetflixServiceState>({
         autoPause: {
             next: null,
             last: null
@@ -41,7 +43,7 @@ export class NetflixService extends MutationObserverService {
                     if (window.location.href.indexOf('netflix.com/watch') === -1) return;
                     const parser = new DOMParser();
                     const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-                    _this.store.patch({ subtitles: new SubtitlesParserService().parseSubtitles(ttmlDoc)});
+                    _this.store.patch({ subtitles: new SubtitlesParserService().parseSubtitles(ttmlDoc) });
                     _this.createSubtitlesStyleElement();
                 } catch { }
             });
@@ -117,33 +119,38 @@ export class NetflixService extends MutationObserverService {
 
     protected onSubtitleDisplayed(key: string): void {
         try {
-            this.showSubtitleTranslation(key);
-            this.translateNextSubtitle(key);
+            const subtitle = this.store.state.subtitles[key];
+            this.showSubtitleTranslation(subtitle);
+
+            if (subtitle.translations) {
+                this.translateNextSubtitle(subtitle);
+            } else {
+                this.translateSubtitle(subtitle);
+            }
         } catch (e) { console.log(e); }
     }
 
-    protected showSubtitleTranslation(key: string): void {
-        const subtitle = this.store.state.subtitles[key];
-
-        //if (!subtitle.translations.length) {
-        //    this.translateSubtitle(subtitle);
-        //}
-
+    protected showSubtitleTranslation(subtitle: ISubtitle): void {
         this.updateSubtitlesStyle(subtitle.translations, subtitle.lines.length);
 
         if (this.store.state.autoPause) {
-            this.store.state.autoPause.next = subtitle.occurences[0].end;
+            this.store.patch({
+                autoPause: {
+                    ...this.store.state.autoPause,
+                    next: subtitle.occurences[0].end
+                }
+            });
         }
     }
 
-    protected translateNextSubtitle(key: string): void {
-        const nextKey = this.store.state.subtitles[key].occurences[0].next;
+    protected translateNextSubtitle(subtitle: ISubtitle): void {
+        const nextKey = subtitle.occurences[0].next;
         const next = this.store.state.subtitles[nextKey];
         this.translateSubtitle(next);
     }
 
     protected translateSubtitle(subtitle: ISubtitle): void {
-        if (!subtitle.translations.length) {
+        if (!subtitle.translations) {
             sendNotification('translate', JSON.stringify({ value: subtitle.lines.join(' ||| ') }));
         }
     }
@@ -153,21 +160,20 @@ export class NetflixService extends MutationObserverService {
         const translations = translation.split(/\s*\|\|\|\s*/g);
 
         const subtitle = this.store.state.subtitles[key];
-        if (subtitle) {
-            this.store.patch({
-                subtitles: {
-                    ...this.store.state.subtitles,
-                    [subtitle.key]: {
-                        ...subtitle,
-                        translations: translations
-                    }
+        this.store.patch({
+            subtitles: {
+                ...this.store.state.subtitles,
+                [subtitle.key]: {
+                    ...subtitle,
+                    translations: translations
                 }
-            });
+            }
+        });
 
-            //const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
-            //if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
-            //    this.updateSubtitlesStyle(translations, subtitle.lines.length);
-            //}
+        const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
+        if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
+            this.updateSubtitlesStyle(translations, subtitle.lines.length);
+            this.translateNextSubtitle(subtitle);
         }
     }
 

@@ -16,7 +16,7 @@ export class SubtitlesParserService {
                     key: key,
                     occurences: [occurence],
                     lines: lines,
-                    translations: []
+                    translations: null
                 };
             } else {
                 subtitles[key].occurences.push(occurence);
