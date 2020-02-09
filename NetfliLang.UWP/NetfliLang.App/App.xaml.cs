@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI;
 
 namespace NetfliLang.App
 {
@@ -64,6 +65,9 @@ namespace NetfliLang.App
 
                 // Place the frame in the current Window
                 Window.Current.Content = rootFrame;
+
+                // Customize TitleBar
+                CustomizeTitleBar();
             }
 
             if (e.PrelaunchActivated == false)
@@ -102,6 +106,16 @@ namespace NetfliLang.App
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: Save application state and stop any background activity
             deferral.Complete();
+        }
+
+        private void CustomizeTitleBar()
+        {
+            new Core.ViewManagement.TitleBar().CustomizeDesktopTitleBar(titleBar =>
+            {
+                titleBar.BackgroundColor = Colors.Black;
+                titleBar.ButtonBackgroundColor = Colors.Black;
+                titleBar.ButtonForegroundColor = Colors.White;
+            });
         }
     }
 }
