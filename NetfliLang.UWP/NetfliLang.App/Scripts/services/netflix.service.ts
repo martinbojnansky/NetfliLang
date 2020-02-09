@@ -2,19 +2,31 @@ import { MutationObserverService } from "./mutation-observer.service";
 import { sendNotification } from "../helpers/notifications";
 import { ISubtitles, ISubtitle } from "../models/subtitles";
 import { SubtitlesParserService } from "./subtitles-parser.service";
+import { Store } from "../models/store";
 
 export class NetflixService extends MutationObserverService {
-    protected subtitles: ISubtitles;
+    protected store = new Store<{
+        subtitles: ISubtitles,
+        autoPause: false | {
+            next: number,
+            last: number
+        }
+    }>({
+        autoPause: {
+            next: null,
+            last: null
+        }
+    });
+
+    protected style: HTMLStyleElement;
 
     protected get video(): HTMLVideoElement {
         return document.querySelector('video');
     }
 
-    protected style: HTMLStyleElement;
-
-    protected autoPause: boolean = true;
-    protected autoPauseOn: number;
-    protected lastAutoPauseOn: number;
+    protected get pauseButton(): HTMLButtonElement {
+        return document.querySelector('.button-nfplayerPause');
+    }
 
     protected init(): void {
         super.init();
@@ -29,7 +41,7 @@ export class NetflixService extends MutationObserverService {
                     if (window.location.href.indexOf('netflix.com/watch') === -1) return;
                     const parser = new DOMParser();
                     const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-                    _this.subtitles = (new SubtitlesParserService()).parseSubtitles(ttmlDoc);
+                    _this.store.patch({ subtitles: new SubtitlesParserService().parseSubtitles(ttmlDoc)});
                     _this.createSubtitlesStyleElement();
                 } catch { }
             });
@@ -58,7 +70,7 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected updateSubtitlesStyle(translations: string[], expectedLength: number): void {
-        let style = `
+        let css = `
             .player-timedtext span {
                 display: block;
                 color: yellow !important;
@@ -88,13 +100,13 @@ export class NetflixService extends MutationObserverService {
 
         if (translations && translations.length === expectedLength) {
             translations.forEach((translation, index) => {
-                style += this.getSubtitleTranslationStyle(index + 1, translation);
+                css += this.getSubtitleTranslationStyle(index + 1, translation);
             });
         } else if (translations && translations.length < expectedLength) {
-            style += this.getSubtitleTranslationStyle(expectedLength, translations.join(' '));
+            css += this.getSubtitleTranslationStyle(expectedLength, translations.join(' '));
         }
 
-        this.style.innerHTML = style;
+        this.style.innerHTML = css;
     }
 
     protected getSubtitleTranslationStyle(index: number, content: string): string {
@@ -111,7 +123,7 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected showSubtitleTranslation(key: string): void {
-        const subtitle = this.subtitles[key];
+        const subtitle = this.store.state.subtitles[key];
 
         //if (!subtitle.translations.length) {
         //    this.translateSubtitle(subtitle);
@@ -119,14 +131,14 @@ export class NetflixService extends MutationObserverService {
 
         this.updateSubtitlesStyle(subtitle.translations, subtitle.lines.length);
 
-        if (this.autoPause) {
-            this.autoPauseOn = subtitle.occurences[0].end; // TODO: Find next occurence based on time
+        if (this.store.state.autoPause) {
+            this.store.state.autoPause.next = subtitle.occurences[0].end;
         }
     }
 
     protected translateNextSubtitle(key: string): void {
-        const nextKey = this.subtitles[key].occurences[0].next; // TODO: Find next occurence based on time
-        const next = this.subtitles[nextKey];
+        const nextKey = this.store.state.subtitles[key].occurences[0].next;
+        const next = this.store.state.subtitles[nextKey];
         this.translateSubtitle(next);
     }
 
@@ -140,27 +152,41 @@ export class NetflixService extends MutationObserverService {
         const key = value.replace(/\s\|\|\|\s/g, '');
         const translations = translation.split(/\s*\|\|\|\s*/g);
 
-        if (this.subtitles.hasOwnProperty(key)) {
-            this.subtitles[key].translations = translations;
+        const subtitle = this.store.state.subtitles[key];
+        if (subtitle) {
+            this.store.patch({
+                subtitles: {
+                    ...this.store.state.subtitles,
+                    [subtitle.key]: {
+                        ...subtitle,
+                        translations: translations
+                    }
+                }
+            });
 
             //const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
             //if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
-            //    this.updateSubtitlesStyle([translations]);
+            //    this.updateSubtitlesStyle(translations, subtitle.lines.length);
             //}
         }
     }
 
     protected onTimeUpdated(): void {
-        if (!this.autoPause || !this.video || !this.autoPauseOn) return;
+        if (!this.store.state.autoPause || !this.video || !this.store.state.autoPause.next) return;
 
         const time = this.video.currentTime;
-        const isEndingSoon = time >= this.autoPauseOn - 0.25 && time <= this.autoPauseOn;
-        const wasNotPausedAlready = this.autoPauseOn !== this.lastAutoPauseOn;
+        const isEndingSoon = time >= this.store.state.autoPause.next - 0.25 && time <= this.store.state.autoPause.next;
+        const wasNotPausedAlready = this.store.state.autoPause.next !== this.store.state.autoPause.last;
         if (time && isEndingSoon && wasNotPausedAlready) {
-            this.lastAutoPauseOn = this.autoPauseOn;
-            const pauseIn = (this.autoPauseOn - time) * 1000 - 100;
+            this.store.patch({
+                autoPause: {
+                    ...this.store.state.autoPause,
+                    last: this.store.state.autoPause.next
+                }
+            });
+            const pauseIn = (this.store.state.autoPause.next - time) * 1000 - 100;
             setTimeout(() => {
-                document.querySelector('.button-nfplayerPause').dispatchEvent(new Event('click'));
+                this.pauseButton.dispatchEvent(new Event('click'));
             }, pauseIn);
         }
     }
