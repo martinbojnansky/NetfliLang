@@ -183,10 +183,12 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
         };
         NetflixService.prototype.translateSubtitle = function (subtitle) {
             if (!subtitle.translations.length) {
-                notifications_1.sendNotification('translate', JSON.stringify({ key: subtitle.key, lines: subtitle.lines }));
+                notifications_1.sendNotification('translate', JSON.stringify({ value: "<p>" + subtitle.lines.join('</p><p>') + "</p>" }));
             }
         };
-        NetflixService.prototype.translationReceived = function (key, translations) {
+        NetflixService.prototype.translationReceived = function (value, translation) {
+            var key = value.replace(/<[^>]*>/g, '');
+            var translations = translation.replace(/\s*<[^>]*>\s*(?!\s*<)/g, '').split(/\s*<[^>]*>\s*/g);
             if (this.subtitles.hasOwnProperty(key)) {
                 this.subtitles[key].translations = translations;
                 //const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');

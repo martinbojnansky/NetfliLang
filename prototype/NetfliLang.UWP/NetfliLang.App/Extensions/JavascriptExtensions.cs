@@ -8,7 +8,7 @@ namespace UWPToolkit.Template.Extensions
     {
         public static string EscapeJavascript(this string javascript)
         {
-            return javascript.Replace("'", "\'");
+            return javascript?.Replace("'", "\'");
         }
 
         public static async Task<string> InvokeJavascriptAsync(this WebView webView, string javascript)

@@ -58,7 +58,7 @@ namespace NetfliLang.App.ViewModels
             {
                 case "translate":
                     var translateAction = JsonSerializer.FromJson<TranslateAction>(payload);
-                    GTranslateWebViewMessenger.InvokeScript($"translator.translate('{string.Join("|||", translateAction.lines).EscapeJavascript()}');");
+                    GTranslateWebViewMessenger.InvokeScript($"translator.translate('{translateAction.value.EscapeJavascript()}');");
                     break;
             }
         }
@@ -69,7 +69,7 @@ namespace NetfliLang.App.ViewModels
             {
                 case "translated":
                     var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
-                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.Replace("|||", "").EscapeJavascript()}', { JsonSerializer.ToJson(Regex.Split(translatedAction.translation, @"\|\|\|")).EscapeJavascript()})";
+                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.EscapeJavascript()}', '{translatedAction.translation.EscapeJavascript()}')";
                     NetflixWebViewMessenger.InvokeScript(onTranslated);
                     break;
             }
