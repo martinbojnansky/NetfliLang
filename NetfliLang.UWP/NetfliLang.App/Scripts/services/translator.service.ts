@@ -29,7 +29,7 @@ export class GTranslatorService extends TranslatorService {
         } catch (e) { console.log(e); }
     }
 
-    public translate(value: string) {
+    public translate(value: string): void {
         this.source.value = value;
     }
 }
