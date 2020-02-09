@@ -190,6 +190,9 @@
   <ItemGroup>
     <None Include="Scripts\services\subtitles-parser.service.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\models\store.ts" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
