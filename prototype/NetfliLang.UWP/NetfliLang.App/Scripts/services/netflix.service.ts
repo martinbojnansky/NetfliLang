@@ -57,7 +57,7 @@ export class NetflixService extends MutationObserverService {
         }
     }
 
-    protected updateSubtitlesStyle(translations): void {
+    protected updateSubtitlesStyle(translations: string[], expectedLength: number): void {
         let style = `
             .player-timedtext span {
                 display: block;
@@ -86,15 +86,21 @@ export class NetflixService extends MutationObserverService {
             }
         `;
 
-        if (translations) {
+        if (translations && translations.length === expectedLength) {
             translations.forEach((translation, index) => {
-                style += `.player-timedtext span:nth-child(` + (index + 1) + `)::after {
-                    content: '` + translation + `';
-                }`;
+                style += this.getSubtitleTranslationStyle(index + 1, translation);
             });
+        } else if (translations && translations.length < expectedLength) {
+            style += this.getSubtitleTranslationStyle(expectedLength, translations.join(' '));
         }
 
         this.style.innerHTML = style;
+    }
+
+    protected getSubtitleTranslationStyle(index: number, content: string): string {
+        return `.player-timedtext span:nth-child(${index})::after {
+                content: '${content}';
+            }`
     }
 
     protected onSubtitleDisplayed(key: string): void {
@@ -111,7 +117,7 @@ export class NetflixService extends MutationObserverService {
         //    this.translateSubtitle(subtitle);
         //}
 
-        this.updateSubtitlesStyle(subtitle.translations);
+        this.updateSubtitlesStyle(subtitle.translations, subtitle.lines.length);
 
         if (this.autoPause) {
             this.autoPauseOn = subtitle.occurences[0].end; // TODO: Find next occurence based on time
