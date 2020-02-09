@@ -1,6 +1,7 @@
 ﻿using NetfliLang.Messaging;
 using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using UWPToolkit.Template.Extensions;
 using Windows.UI.ViewManagement;
@@ -11,6 +12,8 @@ namespace UWPToolkit.Template.Controls
 {
     public sealed partial class ExtendedWebView : UserControl
     {
+        private SemaphoreSlim _semaphore = new SemaphoreSlim(1,1);
+
         public string Source
         {
             get => (string)GetValue(SourceProperty);
@@ -70,11 +73,16 @@ namespace UWPToolkit.Template.Controls
         {
             try
             {
+                await _semaphore.WaitAsync();
                 await WebView.InvokeJavascriptAsync(script);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+            }
+            finally
+            {
+                _semaphore.Release(1);
             }
         }
 
