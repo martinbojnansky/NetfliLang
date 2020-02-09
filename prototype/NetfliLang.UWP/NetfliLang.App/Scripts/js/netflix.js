@@ -148,14 +148,21 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
                 document.head.insertAdjacentElement('beforeend', this.style);
             }
         };
-        NetflixService.prototype.updateSubtitlesStyle = function (translations) {
+        NetflixService.prototype.updateSubtitlesStyle = function (translations, expectedLength) {
+            var _this_1 = this;
             var style = "\n            .player-timedtext span {\n                display: block;\n                color: yellow !important;\n            }\n\n            .player-timedtext span > br {\n                display: none;\n            }\n\n            .player-timedtext span::after {\n                content: '';                \n                display: block;\n                color: white;\n                font-size: 2.5rem;\n                line-height: normal;\n                font-weight: normal;\n                color: #ffffff;\n                text-shadow: #000000 0px 0px 7px;\n                font-family: Netflix Sans, Helvetica Nueue, Helvetica, Arial, sans-serif;\n                font-weight: bold;\n            }\n\n            .player-timedtext span:not(:last-child)::after {\n                margin-bottom: 4px;\n            }\n        ";
-            if (translations) {
+            if (translations && translations.length === expectedLength) {
                 translations.forEach(function (translation, index) {
-                    style += ".player-timedtext span:nth-child(" + (index + 1) + ")::after {\n                    content: '" + translation + "';\n                }";
+                    style += _this_1.getSubtitleTranslationStyle(index + 1, translation);
                 });
             }
+            else if (translations && translations.length < expectedLength) {
+                style += this.getSubtitleTranslationStyle(expectedLength, translations.join(' '));
+            }
             this.style.innerHTML = style;
+        };
+        NetflixService.prototype.getSubtitleTranslationStyle = function (index, content) {
+            return ".player-timedtext span:nth-child(" + index + ")::after {\n                content: '" + content + "';\n            }";
         };
         NetflixService.prototype.onSubtitleDisplayed = function (key) {
             try {
@@ -171,7 +178,7 @@ define("services/netflix.service", ["require", "exports", "services/mutation-obs
             //if (!subtitle.translations.length) {
             //    this.translateSubtitle(subtitle);
             //}
-            this.updateSubtitlesStyle(subtitle.translations);
+            this.updateSubtitlesStyle(subtitle.translations, subtitle.lines.length);
             if (this.autoPause) {
                 this.autoPauseOn = subtitle.occurences[0].end; // TODO: Find next occurence based on time
             }
