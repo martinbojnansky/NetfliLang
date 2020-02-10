@@ -1,6 +1,8 @@
-﻿using NetfliLang.App.Views;
+﻿using NetfliLang.App.Models;
+using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UWPToolkit.Template.Extensions;
 using UWPToolkit.Template.Models;
@@ -13,15 +15,18 @@ namespace NetfliLang.App.ViewModels
     {
         public ILocalObjectStorage LocalObjectStorage { get; set; }
         public IJsonSerializer JsonSerializer { get; set; }
-        public IScriptsService ScriptsService { get; set; }
+        public IResourceService ResourceService { get; set; }
         public IWebViewMessenger NetflixWebViewMessenger { get; set; }
         public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
 
         private string _netflixExtensionScript;
-        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ScriptsService.ReadJavascriptResourceFile("netflix.js", "require.js");
+        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
 
         private string _gTranslatorExtensionScript;
-        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("translator.js", "require.js");
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
+
+        private IEnumerable<Language> _languages;
+        public IEnumerable<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
 
         private bool _isTranslatorVisible = true;
         public bool IsTranslatorVisible
