@@ -25,17 +25,21 @@ namespace NetfliLang.App.ViewModels
         private string _gTranslatorExtensionScript;
         public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
 
-        private IEnumerable<Language> _languages;
-        public IEnumerable<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
+        private List<Language> _languages;
+        public List<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
 
-        private bool _isTranslatorVisible = true;
-        public bool IsTranslatorVisible
+        private Language _selectedLanguage;
+        public Language SelectedLanguage
         {
-            get => _isTranslatorVisible;
+            get => _selectedLanguage != null ? _selectedLanguage : _selectedLanguage = RestoreLanguage();
             set
             {
-                _isTranslatorVisible = value;
-                RaisePropertyChanged();
+                if (value != _selectedLanguage)
+                {
+                    _selectedLanguage = value;
+                    RaisePropertyChanged();
+                    // TODO: Apply language
+                }
             }
         }
 
@@ -53,6 +57,8 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
+
+            StoreLanguage();
 
             base.OnNavigatedFrom(e);
         }
@@ -80,9 +86,26 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
-        public void NavigateToSettingsPage()
+        protected void StoreLanguage()
         {
-            Navigation.GoTo(typeof(SettingsView), "This is navigation parameter");
+            LocalObjectStorage.SetValue(nameof(SelectedLanguage), _selectedLanguage.Id);
+        }
+
+        protected Language RestoreLanguage()
+        {
+            try
+            {
+                var id = LocalObjectStorage.GetValue<string>(nameof(SelectedLanguage));
+                return _languages.Find(l => l.Id == id);
+            }
+            catch
+            {
+                return _languages.Find(l => l.Id == "en");
+            }
+            finally
+            {
+                // TODO: Apply language
+            }
         }
     }
 }

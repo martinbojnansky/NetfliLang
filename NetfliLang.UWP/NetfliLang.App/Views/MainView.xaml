@@ -31,12 +31,20 @@
             Source="https://translate.google.com/"
             ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
-            Width="320"
-            Visibility="{x:Bind ViewModel.IsTranslatorVisible, Mode=OneWay}">
+            Width="320">
         </controls:ExtendedWebView>
         <!-- toolbar -->
-        <StackPanel  Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <ToggleSwitch IsOn="{x:Bind ViewModel.IsTranslatorVisible, Mode=TwoWay}" OnContent="Translator" OffContent="Translator" Margin="0,0,40,0"></ToggleSwitch>
+        <StackPanel 
+            Grid.Row="1" Grid.ColumnSpan="2" 
+            Orientation="Horizontal" 
+            HorizontalAlignment="Right" 
+            Padding="10,5">
+            <ComboBox 
+                Width="250" 
+                ItemsSource="{x:Bind ViewModel.Languages, Mode=OneTime}" 
+                SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" 
+                DisplayMemberPath="Name">
+            </ComboBox>
         </StackPanel>
     </Grid>
 </navigation:NavigationPage>
