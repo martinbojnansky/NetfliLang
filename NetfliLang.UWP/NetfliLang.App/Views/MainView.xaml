@@ -37,10 +37,10 @@
         <StackPanel 
             Grid.Row="1" Grid.ColumnSpan="2" 
             Orientation="Horizontal" 
-            HorizontalAlignment="Right" 
-            Padding="10,5">
+            HorizontalAlignment="Center" 
+            Padding="5">
             <ComboBox 
-                Width="250" 
+                Width="300" 
                 ItemsSource="{x:Bind ViewModel.Languages, Mode=OneTime}" 
                 SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" 
                 DisplayMemberPath="Name">

@@ -38,7 +38,7 @@ namespace NetfliLang.App.ViewModels
                 {
                     _selectedLanguage = value;
                     RaisePropertyChanged();
-                    // TODO: Apply language
+                    ApplyLanguage(value);
                 }
             }
         }
@@ -58,7 +58,7 @@ namespace NetfliLang.App.ViewModels
             NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
 
-            StoreLanguage();
+            StoreLanguage(_selectedLanguage);
 
             base.OnNavigatedFrom(e);
         }
@@ -86,26 +86,36 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
-        protected void StoreLanguage()
+        protected void StoreLanguage(Language language)
         {
-            LocalObjectStorage.SetValue(nameof(SelectedLanguage), _selectedLanguage.Id);
+            LocalObjectStorage.SetValue(nameof(SelectedLanguage), language?.Id);
         }
 
         protected Language RestoreLanguage()
         {
+            Language language = null;
+
             try
             {
                 var id = LocalObjectStorage.GetValue<string>(nameof(SelectedLanguage));
-                return _languages.Find(l => l.Id == id);
+                language = _languages.Find(l => l.Id == id);
             }
             catch
             {
-                return _languages.Find(l => l.Id == "en");
+                language = _languages.Find(l => l.Id == "en");
             }
             finally
             {
-                // TODO: Apply language
+                ApplyLanguage(language);
             }
+
+            return language;
+        }
+
+        protected void ApplyLanguage(Language language)
+        {
+            GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}')"); // TODO: WebView has to be already loaded
+            // TODO: Clear translations
         }
     }
 }
