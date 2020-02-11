@@ -78,9 +78,12 @@ namespace NetfliLang.App.ViewModels
         {
             switch (action)
             {
+                case "ready":
+                    ApplyLanguage(SelectedLanguage);
+                    break;
                 case "translated":
                     var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
-                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.EscapeJavascript()}', '{translatedAction.translation.EscapeJavascript()}')";
+                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.EscapeJavascript()}', '{translatedAction.translation.EscapeJavascript()}');";
                     NetflixWebViewMessenger.InvokeScript(onTranslated);
                     break;
             }
@@ -93,29 +96,21 @@ namespace NetfliLang.App.ViewModels
 
         protected Language RestoreLanguage()
         {
-            Language language = null;
-
             try
             {
                 var id = LocalObjectStorage.GetValue<string>(nameof(SelectedLanguage));
-                language = _languages.Find(l => l.Id == id);
+                return _languages.Find(l => l.Id == id);
             }
             catch
             {
-                language = _languages.Find(l => l.Id == "en");
+                return _languages.Find(l => l.Id == "en");
             }
-            finally
-            {
-                ApplyLanguage(language);
-            }
-
-            return language;
         }
 
         protected void ApplyLanguage(Language language)
         {
-            GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}')"); // TODO: WebView has to be already loaded
-            // TODO: Clear translations
+            NetflixWebViewMessenger.InvokeScript("netflix.clearTranslations();");
+            GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}');");
         }
     }
 }

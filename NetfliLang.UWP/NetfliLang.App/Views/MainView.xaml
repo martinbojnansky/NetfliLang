@@ -12,39 +12,34 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="13*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
+        <!-- gtranslator webview -->
+        <controls:ExtendedWebView
+            Source="https://translate.google.com/"
+            ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
+            WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}">
+        </controls:ExtendedWebView>
         <!-- netflix webview -->
         <controls:ExtendedWebView
             Source="https://netflix.com/"
             ExtensionScript="{x:Bind ViewModel.NetflixExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.NetflixWebViewMessenger}">
         </controls:ExtendedWebView>
-        <!-- gtranslator webview -->
-        <controls:ExtendedWebView
-            Grid.Column="1"
-            Source="https://translate.google.com/"
-            ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
-            WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
-            Width="320">
-        </controls:ExtendedWebView>
         <!-- toolbar -->
-        <StackPanel 
-            Grid.Row="1" Grid.ColumnSpan="2" 
-            Orientation="Horizontal" 
-            HorizontalAlignment="Center" 
+        <Grid 
+            Grid.Row="1"
             Padding="5">
             <ComboBox 
-                Width="300" 
+                HorizontalAlignment="Stretch"
                 ItemsSource="{x:Bind ViewModel.Languages, Mode=OneTime}" 
                 SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" 
                 DisplayMemberPath="Name">
             </ComboBox>
-        </StackPanel>
+        </Grid>
     </Grid>
 </navigation:NavigationPage>

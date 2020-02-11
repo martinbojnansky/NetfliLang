@@ -196,4 +196,17 @@ export class NetflixService extends MutationObserverService {
             }, pauseIn);
         }
     }
+
+    public clearTranslations(): void {
+        if (!this.store.state.subtitles) return;
+
+        let subtitles: ISubtitles = { ...this.store.state.subtitles };
+        Object.keys(subtitles).forEach(key => {
+            subtitles.translations = null;
+        });
+
+        this.store.patch({
+            subtitles: subtitles
+        });
+    }
 }
