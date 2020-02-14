@@ -5,4 +5,10 @@
     xmlns:local="using:NetfliLang.App"
     RequestedTheme="Dark">
 
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="AccentColor">#e50914</Color>
+        </ResourceDictionary>
+    </Application.Resources>
+
 </Application>

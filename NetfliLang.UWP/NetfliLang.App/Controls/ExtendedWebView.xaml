@@ -16,6 +16,7 @@
             NavigationStarting="NavigationStarting"
             DOMContentLoaded="DOMContentLoaded"
             ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
+            DefaultBackgroundColor="Black"
             />
     </Grid>
 </UserControl>
