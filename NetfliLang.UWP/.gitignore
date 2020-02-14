@@ -3,9 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-# Scripts
-**/Scripts/js/*.js
-!**/Scripts/js/require.js
+# Resources
+**/Resources/Javascript/*.js
+!**/Resources/Javascript/require.js
 
 # User-specific files
 *.suo

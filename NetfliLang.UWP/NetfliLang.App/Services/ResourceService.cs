@@ -1,4 +1,5 @@
 ﻿using NetfliLang.App;
+using NetfliLang.Core.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,13 +10,16 @@ using System.Threading.Tasks;
 
 namespace UWPToolkit.Template.Services
 {
-    public interface IScriptsService
+    public interface IResourceService
     {
         string ReadJavascriptResourceFile(string fileName, params string[] dependencies);
+        T ReadJsonResourceFile<T>(string fileName);
     }
 
-    public class ScriptsService: IScriptsService
+    public class ResourceService: IResourceService
     {
+        public IJsonSerializer JsonSerializer { get; set; }
+
         public string ReadJavascriptResourceFile(string fileName, params string[] dependencies)
         {
             var scriptBuilder = new StringBuilder();
@@ -41,9 +45,18 @@ namespace UWPToolkit.Template.Services
             return scriptBuilder.ToString();
         }
 
+        public T ReadJsonResourceFile<T>(string fileName)
+        {
+            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Resources.Json.{fileName}")))
+            {
+                var json = reader.ReadToEnd();
+                return JsonSerializer.FromJson<T>(json);
+            }
+        }
+
         protected string ReadJavascriptResourceFile(string fileName)
         {
-            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Scripts.js.{fileName}")))
+            using (var reader = new StreamReader(typeof(App).GetTypeInfo().Assembly.GetManifestResourceStream($"NetfliLang.App.Resources.Javascript.{fileName}")))
             {
                 return reader.ReadToEnd();
             }

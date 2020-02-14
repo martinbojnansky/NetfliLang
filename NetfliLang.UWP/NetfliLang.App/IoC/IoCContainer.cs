@@ -24,7 +24,7 @@ namespace NetfliLang.App.IoC
             AutoRegister<ViewModelBase>();
 
             Register<IWebViewMessenger, WebViewMessenger>();
-            RegisterSingle<IScriptsService, ScriptsService>();
+            RegisterSingle<IResourceService, ResourceService>();
         }
     }
 }
