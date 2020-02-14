@@ -202,7 +202,7 @@ export class NetflixService extends MutationObserverService {
 
         let subtitles: ISubtitles = { ...this.store.state.subtitles };
         Object.keys(subtitles).forEach(key => {
-            subtitles.translations = null;
+            subtitles[key].translations = null;
         });
 
         this.store.patch({

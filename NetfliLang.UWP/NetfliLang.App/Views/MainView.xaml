@@ -22,7 +22,8 @@
         <controls:ExtendedWebView
             Source="https://translate.google.com/"
             ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
-            WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}">
+            WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
+            Opacity="0">
         </controls:ExtendedWebView>
         <!-- netflix webview -->
         <controls:ExtendedWebView

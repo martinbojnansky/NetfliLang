@@ -39,6 +39,7 @@ namespace NetfliLang.App.ViewModels
                     _selectedLanguage = value;
                     RaisePropertyChanged();
                     ApplyLanguage(value);
+                    StoreLanguage(value);
                 }
             }
         }
@@ -57,8 +58,6 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
-
-            StoreLanguage(_selectedLanguage);
 
             base.OnNavigatedFrom(e);
         }
