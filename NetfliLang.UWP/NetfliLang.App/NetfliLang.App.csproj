@@ -100,16 +100,13 @@
     </Compile>
     <Compile Include="Extensions\JavascriptExtensions.cs" />
     <Compile Include="IoC\IoCContainer.cs" />
+    <Compile Include="Models\Language.cs" />
     <Compile Include="Models\TranslatedAction.cs" />
     <Compile Include="Models\TranslateAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\ScriptsService.cs" />
+    <Compile Include="Services\ResourceService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ViewModelBase.cs" />
-    <Compile Include="Views\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -128,9 +125,9 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <EmbeddedResource Include="Scripts\js\require.js" />
-    <EmbeddedResource Include="Scripts\js\translator.js" />
-    <EmbeddedResource Include="Scripts\js\netflix.js" />
+    <EmbeddedResource Include="Resources\Javascript\require.js" />
+    <EmbeddedResource Include="Resources\Javascript\translator.js" />
+    <EmbeddedResource Include="Resources\Javascript\netflix.js" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -151,10 +148,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,6 +164,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Json\g-languages.json" />
     <None Include="Scripts\helpers\notifications.ts" />
     <None Include="Scripts\services\mutation-observer.service.ts" />
     <None Include="Scripts\services\netflix.service.ts" />

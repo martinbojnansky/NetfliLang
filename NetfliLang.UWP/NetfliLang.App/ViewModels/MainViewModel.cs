@@ -1,6 +1,8 @@
-﻿using NetfliLang.App.Views;
+﻿using NetfliLang.App.Models;
+using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UWPToolkit.Template.Extensions;
 using UWPToolkit.Template.Models;
@@ -13,24 +15,32 @@ namespace NetfliLang.App.ViewModels
     {
         public ILocalObjectStorage LocalObjectStorage { get; set; }
         public IJsonSerializer JsonSerializer { get; set; }
-        public IScriptsService ScriptsService { get; set; }
+        public IResourceService ResourceService { get; set; }
         public IWebViewMessenger NetflixWebViewMessenger { get; set; }
         public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
 
         private string _netflixExtensionScript;
-        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ScriptsService.ReadJavascriptResourceFile("netflix.js", "require.js");
+        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
 
         private string _gTranslatorExtensionScript;
-        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ScriptsService.ReadJavascriptResourceFile("translator.js", "require.js");
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
 
-        private bool _isTranslatorVisible = true;
-        public bool IsTranslatorVisible
+        private List<Language> _languages;
+        public List<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
+
+        private Language _selectedLanguage;
+        public Language SelectedLanguage
         {
-            get => _isTranslatorVisible;
+            get => _selectedLanguage != null ? _selectedLanguage : _selectedLanguage = RestoreLanguage();
             set
             {
-                _isTranslatorVisible = value;
-                RaisePropertyChanged();
+                if (value != _selectedLanguage)
+                {
+                    _selectedLanguage = value;
+                    RaisePropertyChanged();
+                    ApplyLanguage(value);
+                    StoreLanguage(value);
+                }
             }
         }
 
@@ -67,17 +77,39 @@ namespace NetfliLang.App.ViewModels
         {
             switch (action)
             {
+                case "ready":
+                    ApplyLanguage(SelectedLanguage);
+                    break;
                 case "translated":
                     var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
-                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.EscapeJavascript()}', '{translatedAction.translation.EscapeJavascript()}')";
+                    var onTranslated = $"netflix.translationReceived('{translatedAction.value.EscapeJavascript()}', '{translatedAction.translation.EscapeJavascript()}');";
                     NetflixWebViewMessenger.InvokeScript(onTranslated);
                     break;
             }
         }
 
-        public void NavigateToSettingsPage()
+        protected void StoreLanguage(Language language)
         {
-            Navigation.GoTo(typeof(SettingsView), "This is navigation parameter");
+            LocalObjectStorage.SetValue(nameof(SelectedLanguage), language?.Id);
+        }
+
+        protected Language RestoreLanguage()
+        {
+            try
+            {
+                var id = LocalObjectStorage.GetValue<string>(nameof(SelectedLanguage));
+                return _languages.Find(l => l.Id == id);
+            }
+            catch
+            {
+                return _languages.Find(l => l.Id == "en");
+            }
+        }
+
+        protected void ApplyLanguage(Language language)
+        {
+            NetflixWebViewMessenger.InvokeScript("netflix.clearTranslations();");
+            GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}');");
         }
     }
 }
