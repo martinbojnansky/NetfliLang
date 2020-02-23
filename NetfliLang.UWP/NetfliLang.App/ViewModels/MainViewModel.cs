@@ -2,6 +2,7 @@
 using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UWPToolkit.Template.Extensions;
@@ -31,7 +32,7 @@ namespace NetfliLang.App.ViewModels
         private Language _selectedLanguage;
         public Language SelectedLanguage
         {
-            get => _selectedLanguage != null ? _selectedLanguage : _selectedLanguage = RestoreLanguage();
+            get => _selectedLanguage != null ? _selectedLanguage : _selectedLanguage = RestoreUserSetting<string, Language>(nameof(SelectedLanguage), id => _languages.Find(l => l.Id == id), _languages.Find(l => l.Id == "en"));
             set
             {
                 if (value != _selectedLanguage)
@@ -39,7 +40,7 @@ namespace NetfliLang.App.ViewModels
                     _selectedLanguage = value;
                     RaisePropertyChanged();
                     ApplyLanguage(value);
-                    StoreLanguage(value);
+                    StoreUserSetting(nameof(SelectedLanguage), value?.Id);
                 }
             }
         }
@@ -88,21 +89,21 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
-        protected void StoreLanguage(Language language)
+        protected void StoreUserSetting(string key, object value)
         {
-            LocalObjectStorage.SetValue(nameof(SelectedLanguage), language?.Id);
+            LocalObjectStorage.SetValue(key, value);
         }
 
-        protected Language RestoreLanguage()
+        protected TResult RestoreUserSetting<TSetting, TResult>(string key, Func<TSetting, TResult> map, TResult fallback = default(TResult))
         {
             try
             {
-                var id = LocalObjectStorage.GetValue<string>(nameof(SelectedLanguage));
-                return _languages.Find(l => l.Id == id);
+                var setting = LocalObjectStorage.GetValue<TSetting>(key);
+                return map(setting);
             }
             catch
             {
-                return _languages.Find(l => l.Id == "en");
+                return fallback;
             }
         }
 
