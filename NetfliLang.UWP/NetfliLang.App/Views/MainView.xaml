@@ -48,6 +48,7 @@
             </ComboBox>
             <ToggleSwitch 
                 Grid.Column="1"
+                IsOn="{x:Bind ViewModel.AutoPause, Mode=TwoWay, Converter={StaticResource NullableBooleanToBooleanConverter}}"
                 OnContent="Auto-Pause" 
                 OffContent="Auto-Pause"
                 Margin="32,0,0,0">

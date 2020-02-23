@@ -45,6 +45,22 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
+        private bool? _autoPause;
+        public bool? AutoPause
+        {
+            get => _autoPause != null ? _autoPause : _autoPause = RestoreUserSetting<bool?, bool?>(nameof(AutoPause), v => v, true);
+            set
+            {
+                if (value != _autoPause)
+                {
+                    _autoPause = value;
+                    RaisePropertyChanged();
+                    ApplyAutoPause(value);
+                    StoreUserSetting(nameof(AutoPause), value);
+                }
+            }
+        }
+
         public MainViewModel() { }
 
         public override void OnNavigatedTo(NavigationEventArgs e)
@@ -80,6 +96,7 @@ namespace NetfliLang.App.ViewModels
             {
                 case "ready":
                     ApplyLanguage(SelectedLanguage);
+                    ApplyAutoPause(AutoPause);
                     break;
                 case "translated":
                     var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
@@ -111,6 +128,11 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.InvokeScript("netflix.clearTranslations();");
             GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}');");
+        }
+
+        protected void ApplyAutoPause(bool? autoPause)
+        {
+            NetflixWebViewMessenger.InvokeScript($"netflix.setAutoPause({autoPause.ToString().ToLower()});");
         }
     }
 }
