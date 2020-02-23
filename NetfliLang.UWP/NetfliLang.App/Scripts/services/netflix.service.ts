@@ -9,7 +9,8 @@ export interface INetflixServiceState {
     autoPause: false | {
         next: number,
         last: number
-    }
+    },
+    speed: number
 }
 
 export class NetflixService extends MutationObserverService {
@@ -58,6 +59,7 @@ export class NetflixService extends MutationObserverService {
             if (div.classList.contains('player-timedtext-text-container')) {
                 this.onSubtitleDisplayed(node.textContent);
             } else if (div.classList.contains('nfp') && div.classList.contains('AkiraPlayer') && this.video) {
+                this.applySpeed();
                 this.video.ontimeupdate = () => this.onTimeUpdated();
             }
         } catch (e) { console.log(e); }
@@ -210,7 +212,17 @@ export class NetflixService extends MutationObserverService {
         });
     }
 
-    public setAutoPause(value: boolean) {
+    public setAutoPause(value: boolean): void {
         this.store.patch({ autoPause: Boolean(value) ? { next: 0, last: 0 } : false });
+    }
+
+    public setSpeed(value: number): void {
+        this.store.patch({ speed: value });
+        this.applySpeed();
+    }
+
+    protected applySpeed(): void {
+        const speed = this.store.state.speed;
+        this.video.playbackRate = speed ? speed : 1.0; 
     }
 }

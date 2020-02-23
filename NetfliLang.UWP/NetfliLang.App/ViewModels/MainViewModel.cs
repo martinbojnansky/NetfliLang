@@ -20,47 +20,6 @@ namespace NetfliLang.App.ViewModels
         public IWebViewMessenger NetflixWebViewMessenger { get; set; }
         public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
 
-        private string _netflixExtensionScript;
-        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
-
-        private string _gTranslatorExtensionScript;
-        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
-
-        private List<Language> _languages;
-        public List<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
-
-        private Language _selectedLanguage;
-        public Language SelectedLanguage
-        {
-            get => _selectedLanguage != null ? _selectedLanguage : _selectedLanguage = RestoreUserSetting<string, Language>(nameof(SelectedLanguage), id => _languages.Find(l => l.Id == id), _languages.Find(l => l.Id == "en"));
-            set
-            {
-                if (value != _selectedLanguage)
-                {
-                    _selectedLanguage = value;
-                    RaisePropertyChanged();
-                    ApplyLanguage(value);
-                    StoreUserSetting(nameof(SelectedLanguage), value?.Id);
-                }
-            }
-        }
-
-        private bool? _autoPause;
-        public bool? AutoPause
-        {
-            get => _autoPause != null ? _autoPause : _autoPause = RestoreUserSetting<bool?, bool?>(nameof(AutoPause), v => v, true);
-            set
-            {
-                if (value != _autoPause)
-                {
-                    _autoPause = value;
-                    RaisePropertyChanged();
-                    ApplyAutoPause(value);
-                    StoreUserSetting(nameof(AutoPause), value);
-                }
-            }
-        }
-
         public MainViewModel() { }
 
         public override void OnNavigatedTo(NavigationEventArgs e)
@@ -79,10 +38,19 @@ namespace NetfliLang.App.ViewModels
             base.OnNavigatedFrom(e);
         }
 
+        #region Netflix
+
+        private string _netflixExtensionScript;
+        public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
+
         protected void NetflixNotificationReceived(string action, string payload)
         {
             switch (action)
             {
+                case "ready":
+                    ApplyAutoPause(AutoPause);
+                    ApplySpeed(Speed);
+                    break;
                 case "translate":
                     var translateAction = JsonSerializer.FromJson<TranslateAction>(payload);
                     GTranslateWebViewMessenger.InvokeScript($"translator.translate('{translateAction.value.EscapeJavascript()}');");
@@ -90,13 +58,19 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
+        #endregion
+
+        #region GTranslator
+
+        private string _gTranslatorExtensionScript;
+        public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
+
         protected void GTranslateNotificationReceived(string action, string payload)
         {
             switch (action)
             {
                 case "ready":
-                    ApplyLanguage(SelectedLanguage);
-                    ApplyAutoPause(AutoPause);
+                    ApplyLanguage(Language);
                     break;
                 case "translated":
                     var translatedAction = JsonSerializer.FromJson<TranslatedAction>(payload);
@@ -105,6 +79,12 @@ namespace NetfliLang.App.ViewModels
                     break;
             }
         }
+
+        #endregion
+
+        #region Settings
+
+        #region General
 
         protected void StoreUserSetting(string key, object value)
         {
@@ -124,15 +104,92 @@ namespace NetfliLang.App.ViewModels
             }
         }
 
+        #endregion
+
+        #region Language
+
+        private List<Language> _languages;
+        public List<Language> Languages => _languages != null ? _languages : _languages = ResourceService.ReadJsonResourceFile<List<Language>>("g-languages.json");
+
+        private Language _language;
+        public Language Language
+        {
+            get => _language != null ? _language : _language = RestoreUserSetting<string, Language>(nameof(Language), id => _languages.Find(l => l.Id == id), _languages.Find(l => l.Id == "en"));
+            set
+            {
+                if (value != _language)
+                {
+                    _language = value;
+                    RaisePropertyChanged();
+                    ApplyLanguage(value);
+                    StoreUserSetting(nameof(Language), value?.Id);
+                }
+            }
+        }
+
         protected void ApplyLanguage(Language language)
         {
             NetflixWebViewMessenger.InvokeScript("netflix.clearTranslations();");
             GTranslateWebViewMessenger.InvokeScript($"translator.selectTargetLanguage('{language.Id}');");
         }
 
+        #endregion
+
+        #region AutoPause
+
+        private bool? _autoPause;
+        public bool? AutoPause
+        {
+            get => _autoPause != null ? _autoPause : _autoPause = RestoreUserSetting<bool?, bool?>(nameof(AutoPause), v => v, true);
+            set
+            {
+                if (value != _autoPause)
+                {
+                    _autoPause = value;
+                    RaisePropertyChanged();
+                    ApplyAutoPause(value);
+                    StoreUserSetting(nameof(AutoPause), value);
+                }
+            }
+        }
+
         protected void ApplyAutoPause(bool? autoPause)
         {
             NetflixWebViewMessenger.InvokeScript($"netflix.setAutoPause({autoPause.ToString().ToLower()});");
         }
+
+        #endregion
+
+        #region Speed
+
+        public readonly List<Speed> Speeds = new List<Speed>() {
+            new Speed(0.7, "0.7x"),
+            new Speed(1.0, "1x"),
+        };
+
+        private Speed _speed;
+        public Speed Speed
+        {
+            get => _speed != null ? _speed : _speed = RestoreUserSetting<double, Speed>(nameof(Speed), v => Speeds.Find(s => s.Rate == v), Speeds.Find(s => s.Rate == 1.0));
+            set
+            {
+                if (value != _speed)
+                {
+                    _speed = value;
+                    RaisePropertyChanged();
+                    ApplySpeed(value);
+                    StoreUserSetting(nameof(Speed), value?.Rate);
+                }
+            }
+        }
+
+        protected void ApplySpeed(Speed speed)
+        {
+            NetflixWebViewMessenger.InvokeScript($"netflix.setSpeed({speed?.Rate});");
+        }
+
+        #endregion
+
+        #endregion
     }
 }
