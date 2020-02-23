@@ -3,11 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:NetfliLang.App"
+    xmlns:converters="using:NetfliLang.Core.Converters"
     RequestedTheme="Dark">
 
     <Application.Resources>
         <ResourceDictionary>
             <Color x:Key="AccentColor">#e50914</Color>
+            <converters:NullableBooleanToBooleanConverter x:Key="NullableBooleanToBooleanConverter"></converters:NullableBooleanToBooleanConverter>
         </ResourceDictionary>
     </Application.Resources>
 

@@ -209,4 +209,8 @@ export class NetflixService extends MutationObserverService {
             subtitles: subtitles
         });
     }
+
+    public setAutoPause(value: boolean) {
+        this.store.patch({ autoPause: Boolean(value) ? { next: 0, last: 0 } : false });
+    }
 }
