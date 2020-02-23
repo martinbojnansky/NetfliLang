@@ -36,25 +36,35 @@
             Grid.Row="1"
             Padding="4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <ComboBox 
                 HorizontalAlignment="Stretch"
                 ItemsSource="{x:Bind ViewModel.Languages, Mode=OneTime}" 
-                SelectedItem="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}" 
-                DisplayMemberPath="Name">
+                SelectedItem="{x:Bind ViewModel.Language, Mode=TwoWay}" 
+                DisplayMemberPath="Name"
+                Width="320">
+            </ComboBox>
+            <ComboBox
+                Grid.Column="1"
+                ItemsSource="{x:Bind ViewModel.Speeds, Mode=OneTime}"
+                SelectedItem="{x:Bind ViewModel.Speed, Mode=TwoWay}" 
+                DisplayMemberPath="Label"
+                Margin="16,0"
+                Width="100">
             </ComboBox>
             <ToggleSwitch 
-                Grid.Column="1"
+                Grid.Column="2"
                 IsOn="{x:Bind ViewModel.AutoPause, Mode=TwoWay, Converter={StaticResource NullableBooleanToBooleanConverter}}"
                 OnContent="Auto-Pause" 
                 OffContent="Auto-Pause"
-                Margin="32,0,0,0">
+                Margin="4,0">
             </ToggleSwitch>
             <!-- <ToggleSwitch 
-                Grid.Column="2"
+                Grid.Column="3"
                 OnContent="Auto-Continue" 
                 OffContent="Auto-Continue"
                 Margin="16,0">

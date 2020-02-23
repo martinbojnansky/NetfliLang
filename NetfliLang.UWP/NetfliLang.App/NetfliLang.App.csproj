@@ -102,6 +102,7 @@
     <Compile Include="Extensions\JavascriptExtensions.cs" />
     <Compile Include="IoC\IoCContainer.cs" />
     <Compile Include="Models\Language.cs" />
+    <Compile Include="Models\Speed.cs" />
     <Compile Include="Models\TranslatedAction.cs" />
     <Compile Include="Models\TranslateAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
