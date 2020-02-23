@@ -22,6 +22,11 @@ export class NetflixService extends MutationObserverService {
 
     protected style: HTMLStyleElement;
 
+    protected get currentSubtitlesText(): string {
+        const element = document.querySelector('.player-timedtext');
+        return element ? element.textContent : '';
+    }
+
     protected get video(): HTMLVideoElement {
         return document.querySelector('video');
     }
@@ -41,10 +46,11 @@ export class NetflixService extends MutationObserverService {
             this.addEventListener('load', () => {
                 try {
                     if (window.location.href.indexOf('netflix.com/watch') === -1) return;
-                    const parser = new DOMParser();
-                    const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-                    _this.store.patch({ subtitles: new SubtitlesParserService().parseSubtitles(ttmlDoc) });
-                    _this.createSubtitlesStyleElement();
+                    const subtitles = new SubtitlesParserService().tryParseSubtitles(this.responseText);
+                    if (subtitles) {
+                        _this.store.patch({ subtitles: subtitles });
+                        _this.createSubtitlesStyleElement();
+                    }
                 } catch { }
             });
 
@@ -56,7 +62,7 @@ export class NetflixService extends MutationObserverService {
         try {
             const div = node as HTMLDivElement;
             if (div.classList.contains('player-timedtext-text-container')) {
-                this.onSubtitleDisplayed(node.textContent);
+                this.onSubtitleDisplayed(this.currentSubtitlesText);
             } else if (div.classList.contains('nfp') && div.classList.contains('AkiraPlayer') && this.video) {
                 this.video.ontimeupdate = () => this.onTimeUpdated();
             }
@@ -95,7 +101,8 @@ export class NetflixService extends MutationObserverService {
                 font-weight: bold;
             }
 
-            .player-timedtext span:not(:last-child)::after {
+            .player-timedtext .player-timedtext-text-container:only-child span:not(:last-child)::after,
+            .player-timedtext .player-timedtext-text-container:not(:only-child):not(:last-child) span:last-child::after {
                 margin-bottom: 4px;
             }
         `;
@@ -112,7 +119,8 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected getSubtitleTranslationStyle(index: number, content: string): string {
-        return `.player-timedtext span:nth-child(${index})::after {
+        return `.player-timedtext .player-timedtext-text-container:only-child span:nth-child(${index})::after, 
+                .player-timedtext .player-timedtext-text-container:not(:only-child):nth-child(${index}) span:last-child::after {
                 content: '${content}';
             }`
     }
@@ -170,8 +178,7 @@ export class NetflixService extends MutationObserverService {
             }
         });
 
-        const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
-        if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
+        if (this.currentSubtitlesText === key) {
             this.updateSubtitlesStyle(translations, subtitle.lines.length);
             this.translateNextSubtitle(subtitle);
         }
