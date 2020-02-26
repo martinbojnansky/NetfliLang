@@ -73,7 +73,10 @@ export class NetflixService extends MutationObserverService {
         }
     }
 
-    protected updateSubtitlesStyle(translations: string[], expectedLength: number): void {
+    protected updateSubtitlesStyle(subtitle: ISubtitle): void {
+        const translations = subtitle.translations;
+        const expectedLength = subtitle.lines.length;
+
         let css = `
             .player-timedtext span {
                 display: block;
@@ -115,7 +118,7 @@ export class NetflixService extends MutationObserverService {
 
     protected getSubtitleTranslationStyle(index: number, content: string): string {
         return `.player-timedtext span:nth-child(${index})::after {
-                content: '${content}';
+                content: '${content.replace('\'', '\\\'')}';
             }`
     }
 
@@ -133,7 +136,7 @@ export class NetflixService extends MutationObserverService {
     }
 
     protected showSubtitleTranslation(subtitle: ISubtitle): void {
-        this.updateSubtitlesStyle(subtitle.translations, subtitle.lines.length);
+        this.updateSubtitlesStyle(subtitle);
 
         if (this.store.state.autoPause) {
             this.store.patch({
@@ -161,20 +164,22 @@ export class NetflixService extends MutationObserverService {
         const key = value.replace(/\s\|\|\|\s/g, '');
         const translations = translation.split(/\s*\|\|\|\s*/g);
 
-        const subtitle = this.store.state.subtitles[key];
+        let subtitle = this.store.state.subtitles[key];
+        subtitle = {
+            ...subtitle,
+            translations: translations
+        };
+
         this.store.patch({
             subtitles: {
                 ...this.store.state.subtitles,
-                [subtitle.key]: {
-                    ...subtitle,
-                    translations: translations
-                }
+                [subtitle.key]: subtitle
             }
         });
 
         const currentSubtitleElement = document.querySelector('.player-timedtext-text-container');
         if (currentSubtitleElement && currentSubtitleElement.textContent === key) {
-            this.updateSubtitlesStyle(translations, subtitle.lines.length);
+            this.updateSubtitlesStyle(subtitle);
             this.translateNextSubtitle(subtitle);
         }
     }
