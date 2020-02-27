@@ -12,37 +12,59 @@ export interface IGTranslatorServiceState {
 }
 
 export class GTranslatorService extends TranslatorService {
+    // #region properties-definition
+
+    // Gets object that contains single source of thruth (state).
     protected store = new Store<IGTranslatorServiceState>({
         targetLanguage: 'en'
     });
 
+    // Gets element that is used to enter source text for translation.
     protected get source(): HTMLTextAreaElement {
         return document.querySelector('#source')
     }
 
+    // Gets source text used for translation.
     protected get sourceText(): string {
         return this.source.value;
     }
 
+    // Gets translated result text.
     protected get resultText(): string {
         let result = '';
         document.querySelectorAll('.tlid-result .tlid-translation').forEach((r: HTMLSpanElement) => result += r.textContent);
         return result;
     }
 
+    // #endregion
+
+    // #region general
+
+    // Called when any element is added to the page.
     protected onNodeAdded = (node: Node, key: number, parent: NodeList) => {
         try {
+            // Listens to add of translation element.
             if ((node as HTMLDivElement).classList.contains('tlid-result')) {
                 const action = { value: this.sourceText, translation: this.resultText };
                 sendNotification('translated', JSON.stringify(action));
             }
-        } catch (e) { console.log(e); }
+        } catch { }
     }
 
+    // #endregion
+
+    // #region translating
+
+    // Starts translation of the text.
     public translate(value: string): void {
         this.source.value = value;
     }
 
+    // #endregion
+
+    // #region settings 
+
+    // Selects target language for the translation.
     public selectTargetLanguage(id?: string): void {
         if (id) {
             this.store.patch({ targetLanguage: id });
@@ -51,6 +73,7 @@ export class GTranslatorService extends TranslatorService {
         (document.querySelector('.tlid-open-target-language-list') as HTMLDivElement).click();
         (document.querySelector(`.language_list_tl_list .language_list_item_wrapper.language_list_item_wrapper-${id}`) as HTMLDivElement).click();
     }
+
 
     /* Following code can be used to print languages to the console.
      * 
@@ -65,4 +88,6 @@ export class GTranslatorService extends TranslatorService {
     console.log(JSON.stringify(langList))
     *
     */
+
+    // #endregion
 }
