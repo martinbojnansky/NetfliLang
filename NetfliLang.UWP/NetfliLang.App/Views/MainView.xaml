@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:navigation="using:NetfliLang.Core.Navigation"
-    xmlns:controls="using:UWPToolkit.Template.Controls"
+    xmlns:controls="using:NetfliLang.App.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -39,7 +39,6 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <ComboBox 
                 HorizontalAlignment="Stretch"
@@ -63,12 +62,28 @@
                 OffContent="Auto-Pause"
                 Margin="4,0">
             </ToggleSwitch>
-            <!-- <ToggleSwitch 
-                Grid.Column="3"
-                OnContent="Auto-Continue" 
-                OffContent="Auto-Continue"
-                Margin="16,0">
-            </ToggleSwitch> -->
         </Grid>
+        <!-- network notification -->
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Top"
+            Visibility="{x:Bind ViewModel.IsNetworkUnavailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Background="{StaticResource AccentColor}"
+            Margin="0,24,0,0"
+            Padding="24,12"
+            >
+            <SymbolIcon 
+                Symbol="Globe" 
+                Margin="0,0,8,0" />
+            <TextBlock 
+                Text="Network unavailable" 
+                Margin="0,0,24,0" 
+                VerticalAlignment="Center"
+                />
+            <Button 
+                Content="Refresh" 
+                VerticalAlignment="Center"/>
+        </StackPanel>
     </Grid>
 </navigation:NavigationPage>

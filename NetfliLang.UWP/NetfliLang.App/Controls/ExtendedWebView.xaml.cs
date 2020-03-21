@@ -8,7 +8,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace UWPToolkit.Template.Controls
+namespace NetfliLang.App.Controls
 {
     public sealed partial class ExtendedWebView : UserControl
     {
