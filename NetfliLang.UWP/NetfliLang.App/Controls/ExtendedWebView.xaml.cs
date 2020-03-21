@@ -58,10 +58,22 @@ namespace UWPToolkit.Template.Controls
 
         private void NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
+            ProgressBar.Visibility = Visibility.Visible;
+
             if (WebView != null && WebViewMessenger != null)
             {
                 WebView.AddWebAllowedObject(nameof(NetfliLang), WebViewMessenger);
             }
+        }
+
+        private void NavigationCompleted(WebView sender, WebViewNavigationCompletedEventArgs args)
+        {
+            ProgressBar.Visibility = Visibility.Collapsed;
+        }
+
+        private void NavigationFailed(object sender, WebViewNavigationFailedEventArgs e)
+        {
+            ProgressBar.Visibility = Visibility.Collapsed;
         }
 
         private async void WebViewMessenger_ScriptInvoked(string script)

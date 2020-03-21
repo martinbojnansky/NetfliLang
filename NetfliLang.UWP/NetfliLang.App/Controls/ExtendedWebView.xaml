@@ -11,12 +11,22 @@
 
     <Grid>
         <WebView 
-            x:Name="WebView" 
+            x:Name="WebView"
             Source="{x:Bind Source}"
             NavigationStarting="NavigationStarting"
+            NavigationCompleted="NavigationCompleted"
+            NavigationFailed="NavigationFailed"
             DOMContentLoaded="DOMContentLoaded"
             ContainsFullScreenElementChanged="ContainsFullScreenElementChanged"
             DefaultBackgroundColor="Black"
+            />
+        <ProgressBar 
+            x:Name="ProgressBar"
+            Height="16"
+            VerticalAlignment="Top"
+            Background="Transparent"
+            IsIndeterminate="True"
+            Foreground="{StaticResource AccentColor}"
             />
     </Grid>
 </UserControl>
