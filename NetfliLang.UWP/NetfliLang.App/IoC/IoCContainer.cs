@@ -6,6 +6,7 @@ using NetfliLang.App.ViewModels;
 using NetfliLang.Core.ViewManagement;
 using UWPToolkit.Template.Services;
 using NetfliLang.Messaging;
+using NetfliLang.App.Services;
 
 namespace NetfliLang.App.IoC
 {
@@ -19,7 +20,9 @@ namespace NetfliLang.App.IoC
             //RegisterSingle<IRoamingObjectStorage, RoamingObjectStorage>();
             RegisterSingle<IJsonSerializer, JsonSerializer>();
             //RegisterSingle<IXmlSerializer, XmlSerializer>();
-            //RegisterSingle<IAppBar, AppBar>();        
+            //RegisterSingle<IAppBar, AppBar>();       
+            RegisterSingle<INetworkAvailabilityService, NetworkAvailabilityService>();
+
 
             AutoRegister<ViewModelBase>();
 

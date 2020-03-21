@@ -10,6 +10,7 @@
         <ResourceDictionary>
             <Color x:Key="AccentColor">#e50914</Color>
             <converters:NullableBooleanToBooleanConverter x:Key="NullableBooleanToBooleanConverter"></converters:NullableBooleanToBooleanConverter>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></converters:BooleanToVisibilityConverter>
         </ResourceDictionary>
     </Application.Resources>
 

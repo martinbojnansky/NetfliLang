@@ -1,4 +1,5 @@
 ﻿using NetfliLang.App.Models;
+using NetfliLang.App.Services;
 using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
@@ -19,6 +20,7 @@ namespace NetfliLang.App.ViewModels
         public IResourceService ResourceService { get; set; }
         public IWebViewMessenger NetflixWebViewMessenger { get; set; }
         public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
+        public INetworkAvailabilityService NetworkAvailabilityService { get; set; }
 
         public MainViewModel() { }
 
@@ -26,6 +28,7 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived += NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived += GTranslateNotificationReceived;
+            NetworkAvailabilityService.NetworkStatusChanged += NetworkStatusChanged;
 
             base.OnNavigatedTo(e);
         }
@@ -34,6 +37,7 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
+            NetworkAvailabilityService.NetworkStatusChanged -= NetworkStatusChanged;
 
             base.OnNavigatedFrom(e);
         }
@@ -189,6 +193,27 @@ namespace NetfliLang.App.ViewModels
         }
 
         #endregion
+
+        #endregion
+
+        #region NetworkAvailability
+
+        private bool? _isNetworkUnavailable;
+        public bool? IsNetworkUnavailable
+        {
+            get => _isNetworkUnavailable != null ? _isNetworkUnavailable : _isNetworkUnavailable = !NetworkAvailabilityService.GetNetworkStatus();
+            set
+            {
+                _isNetworkUnavailable = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        protected void NetworkStatusChanged(bool isAvailable)
+        {
+            IsNetworkUnavailable = !isAvailable;
+            // TODO: Refresh if network gets available
+        }
 
         #endregion
     }
