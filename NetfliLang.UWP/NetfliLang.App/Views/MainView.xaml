@@ -20,14 +20,14 @@
         </Grid.RowDefinitions>
         <!-- gtranslator webview -->
         <controls:ExtendedWebView
-            Source="https://translate.google.com/"
+            Source="{x:Bind ViewModel.GTranslatorDefaultUrl}"
             ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
             Opacity="0">
         </controls:ExtendedWebView>
         <!-- netflix webview -->
         <controls:ExtendedWebView
-            Source="https://netflix.com/"
+            Source="{x:Bind ViewModel.NetflixDefaultUrl}"
             ExtensionScript="{x:Bind ViewModel.NetflixExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.NetflixWebViewMessenger}">
         </controls:ExtendedWebView>
@@ -75,15 +75,11 @@
             >
             <SymbolIcon 
                 Symbol="Globe" 
-                Margin="0,0,8,0" />
+                Margin="0,0,16,0" />
             <TextBlock 
                 Text="Network unavailable" 
-                Margin="0,0,24,0" 
                 VerticalAlignment="Center"
                 />
-            <Button 
-                Content="Refresh" 
-                VerticalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </navigation:NavigationPage>

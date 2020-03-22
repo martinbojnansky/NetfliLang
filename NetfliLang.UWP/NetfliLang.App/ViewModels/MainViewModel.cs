@@ -1,11 +1,9 @@
 ﻿using NetfliLang.App.Models;
 using NetfliLang.App.Services;
-using NetfliLang.App.Views;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UWPToolkit.Template.Extensions;
 using UWPToolkit.Template.Models;
 using UWPToolkit.Template.Services;
@@ -44,6 +42,8 @@ namespace NetfliLang.App.ViewModels
 
         #region Netflix
 
+        public readonly string NetflixDefaultUrl = "https://www.netflix.com/";
+
         private string _netflixExtensionScript;
         public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
 
@@ -65,6 +65,8 @@ namespace NetfliLang.App.ViewModels
         #endregion
 
         #region GTranslator
+
+        public readonly string GTranslatorDefaultUrl = "https://www.translate.google.com/";
 
         private string _gTranslatorExtensionScript;
         public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
@@ -212,7 +214,17 @@ namespace NetfliLang.App.ViewModels
         protected void NetworkStatusChanged(bool isAvailable)
         {
             IsNetworkUnavailable = !isAvailable;
-            // TODO: Refresh if network gets available
+
+            if (isAvailable)
+            {
+                Refresh();
+            }
+        }
+
+        public void Refresh()
+        {
+            NetflixWebViewMessenger.RequestRefresh();
+            GTranslateWebViewMessenger.RequestRefresh();
         }
 
         #endregion
