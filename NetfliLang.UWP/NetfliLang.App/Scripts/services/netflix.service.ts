@@ -286,7 +286,18 @@ export class NetflixService extends MutationObserverService {
                 }
             });
             // Schedule pause so it ends as close as possible to the time of its disappearance.
-            const pauseIn = (this.store.state.autoPause.next - time) * 1000 - 100; // TODO: Consider applied!
+            const pauseIn =
+                /* difference between end of occurence and current time */
+                (this.store.state.autoPause.next - time)
+                *
+                /* speed */
+                1 / (this.store.state.speed ? this.store.state.speed : 1.0)
+                *
+                /* convert to milliseconds */
+                1000
+                -
+                /* correlation */
+                100;
             setTimeout(() => {
                 this.pauseButton.dispatchEvent(new Event('click'));
             }, pauseIn);

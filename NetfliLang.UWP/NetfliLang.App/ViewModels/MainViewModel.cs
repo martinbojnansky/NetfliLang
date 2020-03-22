@@ -66,7 +66,7 @@ namespace NetfliLang.App.ViewModels
 
         #region GTranslator
 
-        public readonly string GTranslatorDefaultUrl = "https://www.translate.google.com/";
+        public readonly string GTranslatorDefaultUrl = "https://translate.google.com/";
 
         private string _gTranslatorExtensionScript;
         public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
