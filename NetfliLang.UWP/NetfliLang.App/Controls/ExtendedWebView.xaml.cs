@@ -8,7 +8,7 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace UWPToolkit.Template.Controls
+namespace NetfliLang.App.Controls
 {
     public sealed partial class ExtendedWebView : UserControl
     {
@@ -44,16 +44,11 @@ namespace UWPToolkit.Template.Controls
         public ExtendedWebView()
         {
             InitializeComponent();
-        }
+        }   
 
         private async void DOMContentLoaded(WebView sender, WebViewDOMContentLoadedEventArgs args)
         {
             await InvokeScriptAsync(ExtensionScript);
-
-            if (WebViewMessenger != null)
-            {
-                WebViewMessenger.ScriptInvoked += WebViewMessenger_ScriptInvoked;
-            }
         }
 
         private void NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
@@ -63,6 +58,9 @@ namespace UWPToolkit.Template.Controls
             if (WebView != null && WebViewMessenger != null)
             {
                 WebView.AddWebAllowedObject(nameof(NetfliLang), WebViewMessenger);
+
+                WebViewMessenger.ScriptInvoked += async (string script) => await InvokeScriptAsync(script);
+                WebViewMessenger.RefreshRequested += async () => await RefreshAsync();
             }
         }
 
@@ -76,25 +74,32 @@ namespace UWPToolkit.Template.Controls
             ProgressBar.Visibility = Visibility.Collapsed;
         }
 
-        private async void WebViewMessenger_ScriptInvoked(string script)
-        {
-            await InvokeScriptAsync(script);
-        }
-
-        private async Task InvokeScriptAsync(string script)
+        private async Task<string> InvokeScriptAsync(string script)
         {
             try
             {
                 await _semaphore.WaitAsync();
-                await WebView.InvokeJavascriptAsync(script);
+                return await WebView.InvokeJavascriptAsync(script);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+                return null;
             }
             finally
             {
                 _semaphore.Release(1);
+            }
+        }
+
+        private async Task RefreshAsync()
+        {
+            var absoluteUri = WebView?.Source.AbsoluteUri;
+            var hrefLocation = await InvokeScriptAsync("window.location.href");
+
+            if (absoluteUri != hrefLocation)
+            {
+                WebView?.Navigate(WebView.Source);
             }
         }
 

@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:navigation="using:NetfliLang.Core.Navigation"
-    xmlns:controls="using:UWPToolkit.Template.Controls"
+    xmlns:controls="using:NetfliLang.App.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
@@ -20,14 +20,14 @@
         </Grid.RowDefinitions>
         <!-- gtranslator webview -->
         <controls:ExtendedWebView
-            Source="https://translate.google.com/"
+            Source="{x:Bind ViewModel.GTranslatorDefaultUrl}"
             ExtensionScript="{x:Bind ViewModel.GTranslatorExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.GTranslateWebViewMessenger}"
             Opacity="0">
         </controls:ExtendedWebView>
         <!-- netflix webview -->
         <controls:ExtendedWebView
-            Source="https://netflix.com/"
+            Source="{x:Bind ViewModel.NetflixDefaultUrl}"
             ExtensionScript="{x:Bind ViewModel.NetflixExtensionScript}"
             WebViewMessenger="{x:Bind ViewModel.NetflixWebViewMessenger}">
         </controls:ExtendedWebView>
@@ -36,7 +36,6 @@
             Grid.Row="1"
             Padding="4">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -63,12 +62,24 @@
                 OffContent="Auto-Pause"
                 Margin="4,0">
             </ToggleSwitch>
-            <!-- <ToggleSwitch 
-                Grid.Column="3"
-                OnContent="Auto-Continue" 
-                OffContent="Auto-Continue"
-                Margin="16,0">
-            </ToggleSwitch> -->
         </Grid>
+        <!-- network notification -->
+        <StackPanel
+            Orientation="Horizontal"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Top"
+            Visibility="{x:Bind ViewModel.IsNetworkUnavailable, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+            Background="{StaticResource AccentColor}"
+            Margin="0,24,0,0"
+            Padding="24,12"
+            >
+            <SymbolIcon 
+                Symbol="Globe" 
+                Margin="0,0,16,0" />
+            <TextBlock 
+                Text="Network unavailable" 
+                VerticalAlignment="Center"
+                />
+        </StackPanel>
     </Grid>
 </navigation:NavigationPage>

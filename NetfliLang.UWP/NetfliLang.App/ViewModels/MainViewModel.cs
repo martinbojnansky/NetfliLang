@@ -1,10 +1,9 @@
 ﻿using NetfliLang.App.Models;
-using NetfliLang.App.Views;
+using NetfliLang.App.Services;
 using NetfliLang.Core.Storage;
 using NetfliLang.Messaging;
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UWPToolkit.Template.Extensions;
 using UWPToolkit.Template.Models;
 using UWPToolkit.Template.Services;
@@ -19,6 +18,7 @@ namespace NetfliLang.App.ViewModels
         public IResourceService ResourceService { get; set; }
         public IWebViewMessenger NetflixWebViewMessenger { get; set; }
         public IWebViewMessenger GTranslateWebViewMessenger { get; set; }
+        public INetworkAvailabilityService NetworkAvailabilityService { get; set; }
 
         public MainViewModel() { }
 
@@ -26,6 +26,7 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived += NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived += GTranslateNotificationReceived;
+            NetworkAvailabilityService.NetworkStatusChanged += NetworkStatusChanged;
 
             base.OnNavigatedTo(e);
         }
@@ -34,11 +35,14 @@ namespace NetfliLang.App.ViewModels
         {
             NetflixWebViewMessenger.NotificationReceived -= NetflixNotificationReceived;
             GTranslateWebViewMessenger.NotificationReceived -= GTranslateNotificationReceived;
+            NetworkAvailabilityService.NetworkStatusChanged -= NetworkStatusChanged;
 
             base.OnNavigatedFrom(e);
         }
 
         #region Netflix
+
+        public readonly string NetflixDefaultUrl = "https://www.netflix.com/";
 
         private string _netflixExtensionScript;
         public string NetflixExtensionScript => _netflixExtensionScript != null ? _netflixExtensionScript : _netflixExtensionScript = ResourceService.ReadJavascriptResourceFile("netflix.js", "require.js");
@@ -61,6 +65,8 @@ namespace NetfliLang.App.ViewModels
         #endregion
 
         #region GTranslator
+
+        public readonly string GTranslatorDefaultUrl = "https://www.translate.google.com/";
 
         private string _gTranslatorExtensionScript;
         public string GTranslatorExtensionScript => _gTranslatorExtensionScript != null ? _gTranslatorExtensionScript : _gTranslatorExtensionScript = ResourceService.ReadJavascriptResourceFile("translator.js", "require.js");
@@ -189,6 +195,37 @@ namespace NetfliLang.App.ViewModels
         }
 
         #endregion
+
+        #endregion
+
+        #region NetworkAvailability
+
+        private bool? _isNetworkUnavailable;
+        public bool? IsNetworkUnavailable
+        {
+            get => _isNetworkUnavailable != null ? _isNetworkUnavailable : _isNetworkUnavailable = !NetworkAvailabilityService.GetNetworkStatus();
+            set
+            {
+                _isNetworkUnavailable = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        protected void NetworkStatusChanged(bool isAvailable)
+        {
+            IsNetworkUnavailable = !isAvailable;
+
+            if (isAvailable)
+            {
+                Refresh();
+            }
+        }
+
+        public void Refresh()
+        {
+            NetflixWebViewMessenger.RequestRefresh();
+            GTranslateWebViewMessenger.RequestRefresh();
+        }
 
         #endregion
     }
