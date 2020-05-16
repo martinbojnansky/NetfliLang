@@ -6,5 +6,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'NetfliLang';
+  chromeAction() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.executeScript(
+          tabs[0].id,
+          { code: 'console.log(document.body)' },
+      );
+    });
+  }
 }
