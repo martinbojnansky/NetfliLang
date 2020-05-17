@@ -34,10 +34,8 @@ export class AppComponent {
   }
 
   chromeAction() {
-    // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    //   chrome.tabs.executeScript(tabs[0].id, {
-    //     code: 'console.log(document.body)',
-    //   });
-    // });
+    chrome.runtime.sendMessage({ greeting: 'hello' }, function (response) {
+      console.log(response.farewell);
+    });
   }
 }
