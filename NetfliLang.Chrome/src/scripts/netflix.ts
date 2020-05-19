@@ -12,12 +12,15 @@ function interceptHttpCalls(): void {
     password?: string | null
   ): void {
     this.addEventListener('load', () => {
-      console.log('works');
       try {
         if (window.location.href.indexOf('netflix.com/watch') === -1) return;
         const parser = new DOMParser();
         const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
-        console.log(ttmlDoc);
+        document.dispatchEvent(
+          new CustomEvent('parsed', {
+            detail: ttmlDoc.documentElement.innerHTML,
+          })
+        );
       } catch {}
     });
 
