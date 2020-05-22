@@ -1,31 +1,23 @@
-chrome.runtime.onInstalled.addListener(function () {
-  chrome.runtime.onMessage.addListener(function (
-    request,
-    sender,
-    sendResponse
-  ) {
-    if (request.action == 'translate') {
-      chrome.tabs.query(
-        { currentWindow: true, url: 'https://translate.google.com/*' },
-        (tabs) => {
-          if (!tabs?.length) {
-            chrome.tabs.create(
-              { active: false, url: 'https://translate.google.com/' },
-              (tab) => {
-                chrome.tabs.sendMessage(tab.id, request);
-              }
-            );
-          } else {
-            chrome.tabs.sendMessage(tabs[0].id, request);
+import { onMessage, getOrCreateTab } from './shared/extension-helpers';
+import { Action } from 'src/shared/actions';
+import { Constants } from 'src/shared/constants';
 
-            chrome.browserAction.getPopup({ tabId: tabs[0].id }, (result) => {
-              console.log(result);
-            });
-          }
-        }
-      );
-    } else {
-      console.log(request);
+chrome.runtime.onInstalled.addListener(function () {
+  onMessage(async (m) => {
+    // Translator messages
+    if ([Action.translate].includes(m.action)) {
+      console.log('creating tab');
+      const translatorTab = await getOrCreateTab(Constants.translatorUrl);
+      chrome.tabs.sendMessage(translatorTab.id, m);
+    }
+    // Netflix messages
+    else if ([Action.translated].includes(m.action)) {
+      const netflixTab = await getOrCreateTab(Constants.netflixUrl);
+      chrome.tabs.sendMessage(netflixTab.id, m);
+    }
+    // Default
+    else {
+      throw Error(`Unknown message: ${JSON.stringify(m)}`);
     }
   });
 });

@@ -3,34 +3,31 @@
   "version": "0.0.1",
   "description": "",
   "manifest_version": 2,
-  "browser_action": {
-    "default_popup": "index.html"
-  },
   "permissions": [
     "activeTab",
     "https://www.netflix.com/*",
     "https://translate.google.com/*"
   ],
   "background": {
-    "scripts": ["background.js", "runtime.js"],
+    "scripts": ["runtime.js", "background.js"],
     "persistent": false
   },
   "content_scripts": [
     {
       "matches": ["https://www.netflix.com/watch/*"],
-      "js": ["runtime.js", "netflixinjector.js"],
+      "js": ["runtime.js", "netflix.js"],
       "run_at": "document_end"
     },
     {
       "matches": ["https://translate.google.com/*"],
-      "js": ["runtime.js", "translatorinjector.js"],
+      "js": ["runtime.js", "translator.js"],
       "run_at": "document_end"
     }
   ],
   "web_accessible_resources": [
+    "index.html",
     "runtime.js",
-    "netflix.js",
-    "translator.js",
-    "index.html"
+    "netflixInterceptor.js",
+    "*.js.map"
   ]
 }
