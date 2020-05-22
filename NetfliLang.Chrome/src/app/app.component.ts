@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +9,6 @@ export class AppComponent {
   constructor() {}
 
   chromeAction() {
-    console.log('xxx');
-    chrome.runtime.sendMessage({ action: 'set lang' });
+    console.log('popup action');
   }
 }
