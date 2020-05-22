@@ -1,6 +1,6 @@
 import { MutationObserverService } from '../shared/mutation-observer.service';
 import { Store } from '../shared/store';
-import { sendMessage, createPayload } from '../shared/extension-helpers';
+import { sendMessage } from '../shared/extension-helpers';
 import { Action, TranslatedPayload } from 'src/shared/actions';
 
 export abstract class ITranslatorService extends MutationObserverService {
@@ -48,13 +48,10 @@ export class GTranslatorService extends ITranslatorService {
     try {
       // Listens to add of translation element.
       if ((node as HTMLDivElement).classList.contains('tlid-result')) {
-        sendMessage(
-          Action.translated,
-          createPayload<TranslatedPayload>({
-            value: this.sourceText,
-            translation: this.resultText,
-          })
-        );
+        sendMessage<TranslatedPayload>(Action.translated, {
+          value: this.sourceText,
+          translation: this.resultText,
+        });
       }
     } catch {}
   };
@@ -63,9 +60,12 @@ export class GTranslatorService extends ITranslatorService {
 
   // #region translating
 
-  // Starts translation of the text.
+  // Starts translation of the text only if it is different.
   public translate(value: string): void {
-    this.source.value = value;
+    // TODO: Rather send only one message than a condition here
+    if (this.source.value !== value) {
+      this.source.value = value;
+    }
   }
 
   // #endregion

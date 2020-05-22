@@ -1,5 +1,6 @@
 import { Action } from 'src/shared/actions';
 import { IMessage } from 'src/shared/interfaces';
+import { environment } from 'src/environments/environment';
 
 export const injectWebAccessibleResource = <
   T extends keyof HTMLElementTagNameMap
@@ -13,18 +14,23 @@ export const injectWebAccessibleResource = <
   return element;
 };
 
-export const createPayload = <T>(payload: T): T => payload;
-
 export const sendMessage = <T>(action: Action, payload: T) => {
-  chrome.runtime.sendMessage({ action: action, payload: payload } as IMessage<
-    T
-  >);
+  const message = { action: action, payload: payload } as IMessage<T>;
+  chrome.runtime.sendMessage(message);
+  if (!environment.production) {
+    console.log(message);
+  }
 };
 
 export const onMessage = <T>(
   callback: (message: IMessage<T>) => void
 ): void => {
-  chrome.runtime.onMessage.addListener(callback);
+  chrome.runtime.onMessage.addListener((message) => {
+    callback(message);
+    if (!environment.production) {
+      console.log(message);
+    }
+  });
 };
 
 export const getOrCreateTab = (url: string): Promise<chrome.tabs.Tab> => {

@@ -1,7 +1,7 @@
 import { ISubtitles, ISubtitle } from 'src/shared/interfaces';
 import { MutationObserverService } from '../shared/mutation-observer.service';
 import { Store } from '../shared/store';
-import { sendMessage, createPayload } from '../shared/extension-helpers';
+import { sendMessage } from '../shared/extension-helpers';
 import { Action, TranslatePayload } from 'src/shared/actions';
 
 export interface INetflixServiceState {
@@ -22,10 +22,7 @@ export class NetflixService extends MutationObserverService {
 
   // Gets object that contains single source of thruth (state).
   protected readonly store = new Store<INetflixServiceState>({
-    autoPause: {
-      next: null,
-      last: null,
-    },
+    autoPause: false,
   });
 
   // Gets or sets <style> element used to modify current visual styles.
@@ -194,10 +191,9 @@ export class NetflixService extends MutationObserverService {
   protected translateSubtitle(subtitle: ISubtitle): void {
     if (!subtitle.translations) {
       // Lines are joined with special characters to keep semantics and line breaks.
-      sendMessage(
-        Action.translate,
-        createPayload<TranslatePayload>({ value: subtitle.lines.join(' ||| ') })
-      );
+      sendMessage<TranslatePayload>(Action.translate, {
+        value: subtitle.lines.join(' ||| '),
+      });
     }
   }
 
