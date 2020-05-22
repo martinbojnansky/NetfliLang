@@ -17,9 +17,15 @@ chrome.runtime.onInstalled.addListener(function () {
             );
           } else {
             chrome.tabs.sendMessage(tabs[0].id, request);
+
+            chrome.browserAction.getPopup({ tabId: tabs[0].id }, (result) => {
+              console.log(result);
+            });
           }
         }
       );
+    } else {
+      console.log(request);
     }
   });
 });

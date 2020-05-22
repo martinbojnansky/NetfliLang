@@ -27,5 +27,10 @@
       "run_at": "document_end"
     }
   ],
-  "web_accessible_resources": ["runtime.js", "netflix.js", "translator.js"]
+  "web_accessible_resources": [
+    "runtime.js",
+    "netflix.js",
+    "translator.js",
+    "index.html"
+  ]
 }
