@@ -10,7 +10,12 @@ const netflixService = new NetflixService();
 
 injectWebAccessibleResource('script', 'runtime.js');
 injectWebAccessibleResource('script', 'netflixInterceptor.js');
-injectWebAccessibleResource('iframe', 'index.html');
+
+const iframe = injectWebAccessibleResource('iframe', 'index.html');
+iframe.setAttribute(
+  'style',
+  'position: absolute; top: 1rem; left: 50vw; transform: translate(-50%, 0); z-index: 999; border: 0;'
+);
 
 document.addEventListener(
   Action.subtitlesParsed,

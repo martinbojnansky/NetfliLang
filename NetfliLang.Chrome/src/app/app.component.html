@@ -1,2 +1,27 @@
-<h1>NetfliLang</h1>
-<button (click)="chromeAction()">Chrome action</button>
+<!-- toggle -->
+<button mat-button color="primary">NetfliLang</button>
+<!-- popup -->
+<mat-card *ngIf="isOpened">
+  <mat-card-content>
+    <h2>NetfliLang</h2>
+    <form [formGroup]="formGroup">
+      <!-- is enabled-->
+      <mat-slide-toggle formControlName="isEnabled">Enabled</mat-slide-toggle>
+      <ng-container *ngIf="formGroup.value.isEnabled">
+        <!-- target language-->
+        <mat-select formControlName="targetLanguage">
+          <mat-option
+            *ngFor="let language of languages"
+            [value]="language.id"
+            >{{ language.name }}</mat-option
+          >
+        </mat-select>
+        <!-- speed -->
+        <mat-select formControlName="speed">
+          <mat-option value="0.7">0.7x</mat-option>
+          <mat-option value="1.0">1x</mat-option>
+        </mat-select>
+      </ng-container>
+    </form>
+  </mat-card-content>
+</mat-card>
