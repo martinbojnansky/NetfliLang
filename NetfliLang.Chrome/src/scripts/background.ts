@@ -1,4 +1,4 @@
-import { getOrCreateTab, onMessage } from './shared/extension-helpers';
+import { getOrCreateTab, onMessage, getTab } from './shared/extension-helpers';
 import { Action } from 'src/shared/actions';
 import { Constants } from 'src/shared/constants';
 
@@ -12,9 +12,11 @@ chrome.runtime.onInstalled.addListener(function () {
     }
     // Netflix messages
     else if ([Action.translated].includes(m.action)) {
-      getOrCreateTab(Constants.netflixUrl).then((tab) => {
-        chrome.tabs.sendMessage(tab.id, m);
-      });
+      getTab(Constants.netflixUrl)
+        .then((tab) => {
+          chrome.tabs.sendMessage(tab.id, m);
+        })
+        .catch();
     }
     // Default
     else {

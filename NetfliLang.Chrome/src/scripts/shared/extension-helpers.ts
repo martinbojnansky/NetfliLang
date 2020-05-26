@@ -33,14 +33,20 @@ export const onMessage = <T>(
   });
 };
 
+export const getTab = (url: string): Promise<chrome.tabs.Tab> => {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.query({ url: `${url}/*`, currentWindow: true }, (tabs) => {
+      tabs?.length ? resolve(tabs[0]) : reject('Tab not found.');
+    });
+  });
+};
+
 export const getOrCreateTab = (url: string): Promise<chrome.tabs.Tab> => {
   return new Promise((resolve) => {
-    chrome.tabs.query({ url: `${url}/*`, currentWindow: true }, (tabs) => {
-      if (tabs?.length) {
-        resolve(tabs[0]);
-      } else {
+    getTab(url)
+      .then((tab) => resolve(tab))
+      .catch(() => {
         chrome.tabs.create({ url: url, active: false }, (tab) => resolve(tab));
-      }
-    });
+      });
   });
 };
