@@ -3,25 +3,28 @@
 <!-- popup -->
 <mat-card *ngIf="isOpened">
   <mat-card-content>
-    <h2>NetfliLang</h2>
     <form [formGroup]="formGroup">
       <!-- is enabled-->
       <mat-slide-toggle formControlName="isEnabled">Enabled</mat-slide-toggle>
-      <ng-container *ngIf="formGroup.value.isEnabled">
+      <div class="row" *ngIf="formGroup.value.isEnabled">
         <!-- target language-->
-        <mat-select formControlName="targetLanguage">
-          <mat-option
-            *ngFor="let language of languages"
-            [value]="language.id"
-            >{{ language.name }}</mat-option
-          >
-        </mat-select>
+        <div class="column">
+          <h2>Language</h2>
+          <mat-selection-list [multiple]="false">
+            <mat-list-option *ngFor="let language of languages">
+              {{ language.name }}
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
         <!-- speed -->
-        <mat-select formControlName="speed">
-          <mat-option value="0.7">0.7x</mat-option>
-          <mat-option value="1.0">1x</mat-option>
-        </mat-select>
-      </ng-container>
+        <div class="column">
+          <h2>Speed</h2>
+          <mat-selection-list [multiple]="false">
+            <mat-list-option value="0.7">0.7x</mat-list-option>
+            <mat-list-option value="1">1.0x</mat-list-option>
+          </mat-selection-list>
+        </div>
+      </div>
     </form>
   </mat-card-content>
 </mat-card>

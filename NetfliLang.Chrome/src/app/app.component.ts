@@ -1,5 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
+import { ILanguage } from 'src/shared/interfaces';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent {
 
   formGroup = this.formBuilder.group({
     isEnabled: [true, {}],
-    targetLanguage: ['en', {}],
+    targetLanguage: [<ILanguage>{ id: 'en', name: 'English' }, {}],
     speed: ['1.0', {}],
   });
 
@@ -19,7 +20,6 @@ export class AppComponent {
 
   @HostListener('mouseenter') onMouseEnter() {
     this.isOpened = true;
-    console.log('in');
   }
 
   @HostListener('mouseleave') onMouseLeave() {
@@ -443,5 +443,5 @@ export class AppComponent {
       "id": "zu",
       "name": "Zulu"
     }
-  ]`) as { id: string; name: string }[];
+  ]`) as ILanguage[];
 }
