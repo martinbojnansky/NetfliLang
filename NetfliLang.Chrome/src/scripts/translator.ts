@@ -2,6 +2,7 @@ import {
   injectWebAccessibleResource,
   onMessage,
   onDocumentMessage,
+  injectElement,
 } from './shared/extension-helpers';
 import {
   ITranslatorService,
@@ -19,12 +20,12 @@ injectWebAccessibleResource('script', 'vendor.js');
 injectWebAccessibleResource('script', 'main.js');
 
 // Start of Netlfix
-const element = document.createElement('app-root');
-element.setAttribute(
-  'style',
-  'position: absolute; top: 0; left: 40vw; z-index: 999;'
-);
-document.body.appendChild(element);
+injectElement(<any>'app-root', (e: HTMLDivElement) => {
+  e.setAttribute(
+    'style',
+    'position: absolute; top: 0; left: 40vw; z-index: 999;'
+  );
+});
 
 onDocumentMessage(Action.componentCreated, () => {
   chrome.storage.sync.get(Constants.settingsKey, (value) => {

@@ -14,6 +14,16 @@ export const injectWebAccessibleResource = <
   return element;
 };
 
+export const injectElement = <T extends keyof HTMLElementTagNameMap>(
+  tag: T,
+  beforeRendering: (element: HTMLElementTagNameMap[T]) => void = (e) => {}
+): HTMLElementTagNameMap[T] => {
+  const element = document.createElement(tag);
+  beforeRendering(element);
+  document.body.appendChild(element);
+  return element;
+};
+
 export const sendMessage = <T>(action: Action, payload: T) => {
   const message = { action: action, payload: payload } as IMessage<T>;
   chrome.runtime.sendMessage(message);
