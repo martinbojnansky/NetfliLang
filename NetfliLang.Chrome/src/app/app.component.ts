@@ -12,44 +12,22 @@ import { sendDocumentMessage } from 'src/scripts/shared/extension-helpers';
 export class AppComponent implements OnInit {
   isOpened = false;
 
+  get isEnabled(): boolean {
+    return this.formGroup.value?.isEnabled;
+  }
+
   readonly formGroup = this.formBuilder.group(<
     { [key in keyof ISettings]: [any, AbstractControlOptions] }
   >{
     isEnabled: [true, {}],
     targetLanguage: [<ILanguage>{ id: 'en', name: 'English' }, {}],
-    speed: ['1.0', {}],
+    speed: [1, {}],
     autopause: [false, {}],
   });
 
-  constructor(protected formBuilder: FormBuilder) {}
-
-  ngOnInit() {
-    sendDocumentMessage(Action.componentCreated);
-    // TODO: Subscribe safe
-    this.formGroup.valueChanges.subscribe((value) => {
-      sendDocumentMessage(Action.settingsChanged, value);
-    });
-  }
-
-  @HostListener(`document:${Action.settingsRestored}`, ['$event'])
-  public onSettingsRestored(e: CustomEvent) {
-    const value = e?.detail;
-    if (value) {
-      this.formGroup.patchValue(value, { emitEvent: false });
-    }
-  }
-
-  @HostListener('mouseenter') onMouseEnter() {
-    this.isOpened = true;
-  }
-
-  @HostListener('mouseleave') onMouseLeave() {
-    this.isOpened = false;
-  }
-
-  readonly speeds = [0.7, 1];
-
-  readonly languages = JSON.parse(`[
+  readonly toggleOptions = [true, false];
+  readonly speedOptions = [0.7, 1];
+  readonly languageOptions = JSON.parse(`[
     {
       "id": "af",
       "name": "Afrikaans"
@@ -466,5 +444,32 @@ export class AppComponent implements OnInit {
       "id": "zu",
       "name": "Zulu"
     }
-  ]`) as ILanguage[];
+  ]
+  `) as ILanguage[];
+
+  constructor(protected formBuilder: FormBuilder) {}
+
+  ngOnInit() {
+    sendDocumentMessage(Action.componentCreated);
+    // TODO: Subscribe safe
+    this.formGroup.valueChanges.subscribe((value) => {
+      sendDocumentMessage(Action.settingsChanged, value);
+    });
+  }
+
+  @HostListener(`document:${Action.settingsRestored}`, ['$event'])
+  public onSettingsRestored(e: CustomEvent) {
+    const value = e?.detail;
+    if (value) {
+      this.formGroup.patchValue(value, { emitEvent: false });
+    }
+  }
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.isOpened = true;
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.isOpened = false;
+  }
 }

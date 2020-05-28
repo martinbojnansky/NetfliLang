@@ -5,9 +5,10 @@ import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { SelectionListComponent } from './components/selection-list/selection-list.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SelectionListComponent],
   imports: [
     BrowserModule,
     CommonModule,

@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatListModule } from '@angular/material/list';
-import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   imports: [
+    MatButtonModule,
     MatCardModule,
     MatSlideToggleModule,
     MatListModule,
-    MatButtonModule,
   ],
   exports: [
     MatCardModule,

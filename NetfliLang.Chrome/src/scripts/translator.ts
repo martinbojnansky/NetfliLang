@@ -20,12 +20,7 @@ injectWebAccessibleResource('script', 'vendor.js');
 injectWebAccessibleResource('script', 'main.js');
 
 // Start of Netlfix
-injectElement(<any>'app-root', (e: HTMLDivElement) => {
-  e.setAttribute(
-    'style',
-    'position: absolute; top: 0; left: 40vw; z-index: 999;'
-  );
-});
+injectElement(<any>'app-root');
 
 onDocumentMessage(Action.componentCreated, () => {
   chrome.storage.sync.get(Constants.settingsKey, (value) => {
