@@ -14,6 +14,16 @@ export const injectWebAccessibleResource = <
   return element;
 };
 
+export const injectElement = <T extends keyof HTMLElementTagNameMap>(
+  tag: T,
+  beforeRendering: (element: HTMLElementTagNameMap[T]) => void = (e) => {}
+): HTMLElementTagNameMap[T] => {
+  const element = document.createElement(tag);
+  beforeRendering(element);
+  document.body.appendChild(element);
+  return element;
+};
+
 export const sendMessage = <T>(action: Action, payload: T) => {
   const message = { action: action, payload: payload } as IMessage<T>;
   chrome.runtime.sendMessage(message);
@@ -31,6 +41,29 @@ export const onMessage = <T>(
       console.log(message);
     }
   });
+};
+
+export const sendDocumentMessage = <T>(action: Action, payload?: T) => {
+  document.dispatchEvent(
+    new CustomEvent(action, {
+      detail: payload,
+    })
+  );
+  if (!environment.production) {
+    // TODO: Log
+  }
+};
+
+export const onDocumentMessage = <T>(
+  action: Action,
+  callback: (payload: T) => void
+): void => {
+  document.addEventListener(action, (e: CustomEventInit<Document>) => {
+    callback((e?.detail as unknown) as T);
+  });
+  if (!environment.production) {
+    // TODO: Log
+  }
 };
 
 export const getTab = (url: string): Promise<chrome.tabs.Tab> => {

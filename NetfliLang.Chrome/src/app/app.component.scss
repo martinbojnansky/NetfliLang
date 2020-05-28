@@ -1,0 +1,56 @@
+:host {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(0, -50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+button {
+  margin: 0 2rem;
+
+  svg {
+    width: 84%;
+    fill: white;
+  }
+}
+
+mat-card {
+  width: 30rem;
+  max-width: 80vw;
+  height: 40vh;
+
+  div.row {
+    display: flex;
+    flex-direction: row;
+
+    > * {
+      flex: 1 0 auto;
+
+      &:not(:last-child) {
+        margin-right: 2rem;
+      }
+    }
+  }
+
+  div.column {
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      flex: 0 0 auto;
+
+      &:not(:last-child) {
+        margin-bottom: 2rem;
+      }
+    }
+  }
+
+  app-selection-list {
+    max-height: 100%;
+    overflow: auto;
+  }
+}

@@ -1,5 +1,6 @@
 import { Action } from 'src/shared/actions';
 import { SubtitlesParserService } from './netflix/subtitles-parser.service';
+import { sendDocumentMessage } from './shared/extension-helpers';
 
 // Intercepts all HTTP calls in order to find subtitles (TTML document) requested at any time.
 // Loaded TTML document is parsed and saved to the state.
@@ -18,11 +19,7 @@ const interceptHttpCalls = (): void => {
         const parser = new DOMParser();
         const ttmlDoc = parser.parseFromString(this.responseText, 'text/xml');
         const subtitles = new SubtitlesParserService().parseSubtitles(ttmlDoc);
-        document.dispatchEvent(
-          new CustomEvent(Action.subtitlesParsed, {
-            detail: subtitles,
-          })
-        );
+        sendDocumentMessage(Action.subtitlesParsed, subtitles);
       } catch {}
     });
 
