@@ -1,6 +1,7 @@
 import {
   injectWebAccessibleResource,
   onMessage,
+  onDocumentMessage,
 } from './shared/extension-helpers';
 import { Action, TranslatedPayload } from 'src/shared/actions';
 import { NetflixService } from './netflix/netflix.service';
@@ -17,12 +18,9 @@ iframe.setAttribute(
   'position: absolute; top: 1rem; left: 50vw; transform: translate(-50%, 0); z-index: 999; border: 0;'
 );
 
-document.addEventListener(
-  Action.subtitlesParsed,
-  (e: CustomEventInit<Document>) => {
-    netflixService.setSubtitles(<ISubtitles>(<unknown>e?.detail));
-  }
-);
+onDocumentMessage(Action.subtitlesParsed, (subtitles: ISubtitles) => {
+  netflixService.setSubtitles(subtitles);
+});
 
 onMessage((m) => {
   if (m.action === Action.translated) {

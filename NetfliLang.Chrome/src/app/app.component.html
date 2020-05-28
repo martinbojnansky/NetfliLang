@@ -1,12 +1,34 @@
 <!-- toggle -->
 <button mat-button color="primary">NetfliLang</button>
 <!-- popup -->
-<mat-card *ngIf="isOpened">
+<mat-card
+  ><!-- *ngIf="isOpened" -->
   <mat-card-content>
     <form [formGroup]="formGroup">
-      <!-- is enabled-->
+      <!-- on/off -->
       <mat-slide-toggle formControlName="isEnabled">Enabled</mat-slide-toggle>
       <div class="row" *ngIf="formGroup.value.isEnabled">
+        <!-- speed -->
+        <div class="column">
+          <h2>Speed</h2>
+          <mat-selection-list [multiple]="false">
+            <mat-list-option *ngFor="let speed of speeds">
+              {{ speed.toFixed(1) }} x
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
+        <!-- autopause -->
+        <div class="column">
+          <h2>Autopause</h2>
+          <mat-selection-list [multiple]="false">
+            <mat-list-option value="true">
+              On
+            </mat-list-option>
+            <mat-list-option value="false">
+              Off
+            </mat-list-option>
+          </mat-selection-list>
+        </div>
         <!-- target language-->
         <div class="column">
           <h2>Language</h2>
@@ -14,14 +36,6 @@
             <mat-list-option *ngFor="let language of languages">
               {{ language.name }}
             </mat-list-option>
-          </mat-selection-list>
-        </div>
-        <!-- speed -->
-        <div class="column">
-          <h2>Speed</h2>
-          <mat-selection-list [multiple]="false">
-            <mat-list-option value="0.7">0.7x</mat-list-option>
-            <mat-list-option value="1">1.0x</mat-list-option>
           </mat-selection-list>
         </div>
       </div>

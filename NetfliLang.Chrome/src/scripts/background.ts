@@ -2,7 +2,7 @@ import { getOrCreateTab, onMessage, getTab } from './shared/extension-helpers';
 import { Action } from 'src/shared/actions';
 import { Constants } from 'src/shared/constants';
 
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(() => {
   onMessage((m) => {
     // Translator messages
     if ([Action.translate].includes(m.action)) {

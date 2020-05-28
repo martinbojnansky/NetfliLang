@@ -33,6 +33,29 @@ export const onMessage = <T>(
   });
 };
 
+export const sendDocumentMessage = <T>(action: Action, payload?: T) => {
+  document.dispatchEvent(
+    new CustomEvent(action, {
+      detail: payload,
+    })
+  );
+  if (!environment.production) {
+    // TODO: Log
+  }
+};
+
+export const onDocumentMessage = <T>(
+  action: Action,
+  callback: (payload: T) => void
+): void => {
+  document.addEventListener(action, (e: CustomEventInit<Document>) => {
+    callback((e?.detail as unknown) as T);
+  });
+  if (!environment.production) {
+    // TODO: Log
+  }
+};
+
 export const getTab = (url: string): Promise<chrome.tabs.Tab> => {
   return new Promise((resolve, reject) => {
     chrome.tabs.query({ url: `${url}/*`, currentWindow: true }, (tabs) => {

@@ -1,22 +1,43 @@
-import { Component, HostListener } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
-import { ILanguage } from 'src/shared/interfaces';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { FormBuilder, AbstractControlOptions } from '@angular/forms';
+import { ILanguage, ISettings } from 'src/shared/interfaces';
+import { Action } from 'src/shared/actions';
+import { sendDocumentMessage } from 'src/scripts/shared/extension-helpers';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   isOpened = false;
 
-  formGroup = this.formBuilder.group({
+  readonly formGroup = this.formBuilder.group(<
+    { [key in keyof ISettings]: [any, AbstractControlOptions] }
+  >{
     isEnabled: [true, {}],
     targetLanguage: [<ILanguage>{ id: 'en', name: 'English' }, {}],
     speed: ['1.0', {}],
+    autopause: [false, {}],
   });
 
   constructor(protected formBuilder: FormBuilder) {}
+
+  ngOnInit() {
+    sendDocumentMessage(Action.componentCreated);
+    // TODO: Subscribe safe
+    this.formGroup.valueChanges.subscribe((value) => {
+      sendDocumentMessage(Action.settingsChanged, value);
+    });
+  }
+
+  @HostListener(`document:${Action.settingsRestored}`, ['$event'])
+  public onSettingsRestored(e: CustomEvent) {
+    const value = e?.detail;
+    if (value) {
+      this.formGroup.patchValue(value, { emitEvent: false });
+    }
+  }
 
   @HostListener('mouseenter') onMouseEnter() {
     this.isOpened = true;
@@ -26,7 +47,9 @@ export class AppComponent {
     this.isOpened = false;
   }
 
-  languages = JSON.parse(`[
+  readonly speeds = [0.7, 1];
+
+  readonly languages = JSON.parse(`[
     {
       "id": "af",
       "name": "Afrikaans"

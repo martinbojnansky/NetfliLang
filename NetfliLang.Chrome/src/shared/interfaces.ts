@@ -26,3 +26,10 @@ export interface ILanguage {
   id: string;
   name: string;
 }
+
+export interface ISettings {
+  isEnabled: boolean;
+  targetLanguage: ILanguage;
+  speed: number;
+  autopause: boolean;
+}
