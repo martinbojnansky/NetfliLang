@@ -10,7 +10,7 @@
       <mat-slide-toggle formControlName="isEnabled">{{
         isEnabled ? 'On' : 'Off'
       }}</mat-slide-toggle>
-      <div class="row" *ngIf="isEnabled">
+      <ng-container *ngIf="isEnabled">
         <!-- speed -->
         <app-selection-list
           formControlName="speed"
@@ -36,7 +36,7 @@
         >
           <ng-template let-option>{{ option.name }}</ng-template>
         </app-selection-list>
-      </div>
+      </ng-container>
     </form>
   </mat-card-content>
 </mat-card>
