@@ -21,6 +21,7 @@ const netflixService: INetflixService = new NetflixService();
 
 // Applies settings onto netflix service.
 function applySettings(settings: ISettings) {
+  if (!settings) return;
   netflixService.setSpeed(settings.speed);
   netflixService.setAutoPause(settings.autopause);
   netflixService.setLanguage(settings.targetLanguage);

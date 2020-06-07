@@ -7,9 +7,9 @@
   <mat-card-content>
     <form [formGroup]="formGroup">
       <!-- on/off -->
-      <mat-slide-toggle formControlName="isEnabled">{{
+      <!-- <mat-slide-toggle formControlName="isEnabled">{{
         isEnabled ? 'On' : 'Off'
-      }}</mat-slide-toggle>
+      }}</mat-slide-toggle> -->
       <ng-container *ngIf="isEnabled">
         <!-- speed -->
         <app-selection-list
