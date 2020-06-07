@@ -1,4 +1,4 @@
-import { ISubtitles, ISubtitle } from 'src/shared/interfaces';
+import { ISubtitles, ISubtitle, ILanguage } from 'src/shared/interfaces';
 import { MutationObserverService } from '../shared/mutation-observer.service';
 import { Store } from '../shared/store';
 import { sendMessage } from '../shared/extension-helpers';
@@ -6,6 +6,7 @@ import { Action, TranslatePayload } from 'src/shared/actions';
 
 export interface INetflixServiceState {
   subtitles: ISubtitles;
+  language: ILanguage;
   autoPause:
     | false
     | {
@@ -15,9 +16,15 @@ export interface INetflixServiceState {
   speed: number;
 }
 
-// TODO: Create interface
+export abstract class INetflixService extends MutationObserverService {
+  abstract setSpeed(value: number): void;
+  abstract setAutoPause(value: boolean): void;
+  abstract setLanguage(language: ILanguage): void;
+  abstract setSubtitles(subtitles: ISubtitles): void;
+  abstract translationReceived(value: string, translation: string): void;
+}
 
-export class NetflixService extends MutationObserverService {
+export class NetflixService extends INetflixService {
   // #region properties-definition
 
   // Gets object that contains single source of thruth (state).
@@ -239,9 +246,16 @@ export class NetflixService extends MutationObserverService {
 
   // #region language
 
+  // Sets target language and clears previous translations if necessary.
+  public setLanguage(language: ILanguage): void {
+    if (this.store.state.language?.id === language?.id) return;
+    this.store.patch({ language: language });
+    this.clearTranslations();
+  }
+
   // Since subtitle object is translated only once, all translations
   // has to be cleared on language change.
-  public clearTranslations(): void {
+  protected clearTranslations(): void {
     if (!this.store.state.subtitles) return;
 
     let subtitles: ISubtitles = { ...this.store.state.subtitles };
