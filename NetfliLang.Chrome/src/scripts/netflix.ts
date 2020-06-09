@@ -3,6 +3,7 @@ import {
   onMessage,
   onDocumentMessage,
   injectElement,
+  sendDocumentMessage,
 } from './shared/extension-helpers';
 import { Action, TranslatedPayload } from 'src/shared/actions';
 import { NetflixService, INetflixService } from './netflix/netflix.service';
@@ -33,11 +34,7 @@ onDocumentMessage(Action.componentCreated, () => {
   chrome.storage.sync.get(Constants.settingsKey, (value) => {
     const settings = value[Constants.settingsKey] as ISettings;
     // Send stored settings to component once it was created.
-    document.dispatchEvent(
-      new CustomEvent(Action.settingsRestored, {
-        detail: settings,
-      })
-    );
+    sendDocumentMessage(Action.settingsRestored, settings);
     // Apply stored settings.
     applySettings(settings);
   });
@@ -57,7 +54,7 @@ onDocumentMessage(Action.subtitlesParsed, (subtitles: ISubtitles) => {
 onMessage((m) => {
   // Process text translation
   if (m.action === Action.translated) {
-    const translated = <TranslatedPayload>(<unknown>m.payload);
+    const translated = <TranslatedPayload>m.payload;
     netflixService.translationReceived(
       translated?.value,
       translated?.translation

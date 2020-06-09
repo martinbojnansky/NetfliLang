@@ -5,7 +5,7 @@ import { Action, TranslatedPayload } from 'src/shared/actions';
 
 export abstract class ITranslatorService extends MutationObserverService {
   public abstract translate(value: string): void;
-  public abstract selectTargetLanguage(id?: string): void;
+  public abstract setLanguage(id?: string): void;
 }
 
 export interface IGTranslatorServiceState {
@@ -73,7 +73,7 @@ export class GTranslatorService extends ITranslatorService {
     if (this.source.value === value) return;
     // Select source and target languages in case that user has changed them
     if (!this.areCorrectLanguagesSelected) {
-      this.selectTargetLanguage(this.store.state.targetLanguage);
+      this.setLanguage(this.store.state.targetLanguage);
     }
     // Set input field value to initiate translation
     this.source.value = value;
@@ -84,7 +84,7 @@ export class GTranslatorService extends ITranslatorService {
   // #region settings
 
   // Selects target language for the translation.
-  public selectTargetLanguage(id?: string): void {
+  public setLanguage(id?: string): void {
     if (!id) return;
     // Keep language in service state
     this.store.patch({ targetLanguage: id });

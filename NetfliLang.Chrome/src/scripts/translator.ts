@@ -16,19 +16,17 @@ const translatorService: ITranslatorService = new GTranslatorService();
 
 // Applies settings onto translator service.
 function applySettings(settings: ISettings) {
-  translatorService.selectTargetLanguage(settings.targetLanguage.id);
+  translatorService.setLanguage(settings.targetLanguage.id);
 }
 
 // Applies stored settings on first run of this script.
 chrome.storage.sync.get(Constants.settingsKey, (value) => {
-  applySettings((value[Constants.settingsKey] as unknown) as ISettings);
+  applySettings(value[Constants.settingsKey] as ISettings);
 });
 
 // Applies settings on change.
 chrome.storage.onChanged.addListener((value) =>
-  applySettings(
-    (value[Constants.settingsKey]?.newValue as unknown) as ISettings
-  )
+  applySettings(value[Constants.settingsKey]?.newValue as ISettings)
 );
 
 // Listens to messages from extension.
