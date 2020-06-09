@@ -6,6 +6,8 @@ import {
   ContentChild,
   TemplateRef,
   ViewChild,
+  ElementRef,
+  AfterViewInit,
 } from '@angular/core';
 import { ControlValueComponent } from 'src/app/components/control-value/control-value.component';
 import { MatSelectionListChange, MatList } from '@angular/material/list';
@@ -24,7 +26,8 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class SelectionListComponent extends ControlValueComponent<any> {
+export class SelectionListComponent extends ControlValueComponent<any>
+  implements AfterViewInit {
   @Input()
   title: string;
 
@@ -40,8 +43,15 @@ export class SelectionListComponent extends ControlValueComponent<any> {
   @ViewChild(MatList)
   listComponent: MatList;
 
-  constructor(changeDetectorRef: ChangeDetectorRef) {
+  constructor(
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected elementRef: ElementRef
+  ) {
     super(changeDetectorRef);
+  }
+
+  ngAfterViewInit(): void {
+    this.focusValue(this.value);
   }
 
   onSelectionChange(event: MatSelectionListChange): void {
@@ -52,5 +62,16 @@ export class SelectionListComponent extends ControlValueComponent<any> {
     return this.idKey
       ? option[this.idKey] === this.value[this.idKey]
       : option === this.value;
+  }
+
+  focusValue(value: any) {
+    if (!value) return;
+    const index = this.options?.findIndex((o) =>
+      this.idKey ? o[this.idKey] === value[this.idKey] : o === this.value
+    );
+    const element = this.elementRef.nativeElement.querySelector(
+      `mat-list-option:nth-child(${index + 1})`
+    ) as HTMLElement;
+    element?.focus();
   }
 }

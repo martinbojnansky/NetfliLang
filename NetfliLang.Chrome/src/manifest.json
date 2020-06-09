@@ -1,7 +1,7 @@
 {
   "name": "NetfliLang",
   "version": "0.0.1",
-  "description": "",
+  "description": "Watch Netflix and take advantage of free line-by-line translations to 50+ languages. Is it too fast? Don’t worry, slow down the video or use the auto-pause function so you never miss a word again.",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
@@ -15,7 +15,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.netflix.com/watch/*"],
+      "matches": ["https://www.netflix.com/*"],
       "js": ["runtime.js", "netflix.js"],
       "run_at": "document_end"
     },
@@ -34,5 +34,8 @@
     "main.js",
     "*.js.map",
     "netflixInterceptor.js"
-  ]
+  ],
+  "icons": {
+    "128": "assets/icon-128.png"
+  }
 }

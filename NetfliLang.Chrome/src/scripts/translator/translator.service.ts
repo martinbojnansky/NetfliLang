@@ -5,7 +5,7 @@ import { Action, TranslatedPayload } from 'src/shared/actions';
 
 export abstract class ITranslatorService extends MutationObserverService {
   public abstract translate(value: string): void;
-  public abstract selectTargetLanguage(id?: string): void;
+  public abstract setLanguage(id?: string): void;
 }
 
 export interface IGTranslatorServiceState {
@@ -39,6 +39,13 @@ export class GTranslatorService extends ITranslatorService {
     return result;
   }
 
+  // Gets whether correct source and target languages are selected.
+  protected get areCorrectLanguagesSelected(): boolean {
+    return window.location.href.includes(
+      `&sl=auto&tl=${this.store.state.targetLanguage}&`
+    );
+  }
+
   // #endregion
 
   // #region general
@@ -62,10 +69,14 @@ export class GTranslatorService extends ITranslatorService {
 
   // Starts translation of the text only if it is different.
   public translate(value: string): void {
-    // TODO: Rather send only one message than a condition here
-    if (this.source.value !== value) {
-      this.source.value = value;
+    // Do not cancel same translation
+    if (this.source.value === value) return;
+    // Select source and target languages in case that user has changed them
+    if (!this.areCorrectLanguagesSelected) {
+      this.setLanguage(this.store.state.targetLanguage);
     }
+    // Set input field value to initiate translation
+    this.source.value = value;
   }
 
   // #endregion
@@ -73,11 +84,18 @@ export class GTranslatorService extends ITranslatorService {
   // #region settings
 
   // Selects target language for the translation.
-  public selectTargetLanguage(id?: string): void {
-    if (id) {
-      this.store.patch({ targetLanguage: id });
-    }
-
+  public setLanguage(id?: string): void {
+    if (!id) return;
+    // Keep language in service state
+    this.store.patch({ targetLanguage: id });
+    // Always auto-detect source language
+    (document.querySelector(
+      '.tlid-open-source-language-list'
+    ) as HTMLDivElement).click();
+    (document.querySelector(
+      `.language_list_sl_list .language_list_item_wrapper.language_list_item_wrapper-auto`
+    ) as HTMLDivElement).click();
+    // Set target language
     (document.querySelector(
       '.tlid-open-target-language-list'
     ) as HTMLDivElement).click();

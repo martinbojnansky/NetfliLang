@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
   });
 
   readonly toggleOptions = [true, false];
-  readonly speedOptions = [0.7, 1];
+  readonly speedOptions = [0.7, 0.8, 1];
   readonly languageOptions = JSON.parse(`[
     {
       "id": "af",
