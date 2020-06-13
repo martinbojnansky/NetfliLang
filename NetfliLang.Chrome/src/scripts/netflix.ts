@@ -2,7 +2,6 @@ import {
   injectWebAccessibleResource,
   onMessage,
   onDocumentMessage,
-  injectElement,
   sendDocumentMessage,
 } from './shared/extension-helpers';
 import { Action, TranslatedPayload } from 'src/shared/actions';
@@ -15,8 +14,6 @@ injectWebAccessibleResource('script', 'netflixInterceptor.js');
 injectWebAccessibleResource('script', 'polyfills.js');
 injectWebAccessibleResource('script', 'styles.js');
 injectWebAccessibleResource('script', 'vendor.js');
-injectWebAccessibleResource('script', 'main.js');
-injectElement(<any>'app-root');
 
 const netflixService: INetflixService = new NetflixService();
 

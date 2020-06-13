@@ -1,7 +1,5 @@
 <!-- toggle -->
-<button mat-mini-fab [color]="isEnabled ? 'primary' : ''">
-  <app-gtranslate-icon></app-gtranslate-icon>
-</button>
+<app-logo-icon [class.enabled]="isEnabled"></app-logo-icon>
 <!-- popup -->
 <mat-card *ngIf="isOpened">
   <mat-card-content>
@@ -17,7 +15,7 @@
           [options]="speedOptions"
           title="Speed"
         >
-          <ng-template let-option>{{ option.toFixed(1) }}x</ng-template>
+          <ng-template let-option>{{ option.toFixed(2) }}x</ng-template>
         </app-selection-list>
         <!-- autopause -->
         <app-selection-list

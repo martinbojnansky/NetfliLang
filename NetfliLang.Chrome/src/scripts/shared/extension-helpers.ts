@@ -15,14 +15,15 @@ export const injectWebAccessibleResource = <
   return element;
 };
 
-// Appends HTML element to HTML body element.
+// Appends HTML element to HTML target element.
 export const injectElement = <T extends keyof HTMLElementTagNameMap>(
   tag: T,
+  target: HTMLElement,
   beforeRendering: (element: HTMLElementTagNameMap[T]) => void = (e) => {}
 ): HTMLElementTagNameMap[T] => {
   const element = document.createElement(tag);
   beforeRendering(element);
-  document.body.appendChild(element);
+  target.appendChild(element);
   return element;
 };
 
