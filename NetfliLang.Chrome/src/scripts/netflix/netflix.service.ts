@@ -1,7 +1,11 @@
 import { ISubtitles, ISubtitle, ILanguage } from 'src/shared/interfaces';
 import { MutationObserverService } from '../shared/mutation-observer.service';
 import { Store } from '../shared/store';
-import { sendMessage } from '../shared/extension-helpers';
+import {
+  sendMessage,
+  injectElement,
+  injectWebAccessibleResource,
+} from '../shared/extension-helpers';
 import { Action, TranslatePayload } from 'src/shared/actions';
 
 export interface INetflixServiceState {
@@ -71,6 +75,8 @@ export class NetflixService extends INetflixService {
       ) {
         this.video.ontimeupdate = () => this.onTimeUpdated();
         this.applySpeed();
+        injectWebAccessibleResource('script', 'main.js');
+        injectElement(<any>'app-root', div);
       }
     } catch {}
   };

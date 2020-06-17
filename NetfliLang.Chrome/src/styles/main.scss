@@ -1,0 +1,8 @@
+@import './mat-theme';
+
+// Keep element visible with Netflix actions
+// or when it is currently opened.
+.active + app-root,
+app-root.isOpened {
+  display: flex;
+}

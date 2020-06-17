@@ -101,6 +101,10 @@ namespace NetfliLang.App.Controls
             {
                 WebView?.Navigate(WebView.Source);
             }
+            else
+            {
+                await InvokeScriptAsync("window.location.reload()");
+            }
         }
 
         private void ContainsFullScreenElementChanged(WebView sender, object args)

@@ -3,10 +3,10 @@ $gutter: 2rem;
 
 /* wrapper */
 :host {
-  position: absolute;
+  position: fixed;
   top: 50vh;
   left: $gutter;
-  display: flex;
+  display: none; // visibility is specified by styles.css
   flex-direction: row;
   align-items: center;
   transform: translate(0, -50%);
@@ -14,10 +14,11 @@ $gutter: 2rem;
 }
 
 /* toggle */
-button {
-  svg {
-    width: 84%;
-    fill: white;
+app-logo-icon {
+  cursor: pointer;
+
+  &:not(.enabled) {
+    filter: grayscale(100%);
   }
 }
 

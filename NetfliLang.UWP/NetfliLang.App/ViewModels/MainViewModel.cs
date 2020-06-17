@@ -169,8 +169,15 @@ namespace NetfliLang.App.ViewModels
         #region Speed
 
         public readonly List<Speed> Speeds = new List<Speed>() {
-            new Speed(0.7, "0.7x"),
-            new Speed(1.0, "1x"),
+            new Speed(0.6, "0.60x"),
+            new Speed(0.65, "0.65x"),
+            new Speed(0.70, "0.70x"),
+            new Speed(0.75, "0.75x"),
+            new Speed(0.8, "0.80x"),
+            new Speed(0.85, "0.85x"),
+            new Speed(0.9, "0.90x"),
+            new Speed(0.95, "0.95x"),
+            new Speed(1.0, "1.0x"),
         };
 
         private Speed _speed;

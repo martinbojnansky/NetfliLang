@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, HostBinding } from '@angular/core';
 import { FormBuilder, AbstractControlOptions } from '@angular/forms';
 import { ILanguage, ISettings } from 'src/shared/interfaces';
 import { Action } from 'src/shared/actions';
@@ -26,7 +26,8 @@ export class AppComponent implements OnInit {
   });
 
   readonly toggleOptions = [true, false];
-  readonly speedOptions = [0.7, 0.8, 1];
+  readonly speedOptions = [0.7, 0.75, 0.8, 0.85, 0.9, 1];
+  // TODO: Read from JSON file
   readonly languageOptions = JSON.parse(`[
     {
       "id": "af",
@@ -471,5 +472,10 @@ export class AppComponent implements OnInit {
 
   @HostListener('mouseleave') onMouseLeave() {
     this.isOpened = false;
+  }
+
+  @HostBinding('class.isOpened')
+  public get isOpenedClass() {
+    return this.isOpened;
   }
 }
