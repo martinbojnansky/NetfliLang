@@ -39,28 +39,31 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            <Button Content="Retry" Click="{x:Bind ViewModel.Refresh}"></Button>
             <ComboBox 
+                Grid.Column="1"
                 HorizontalAlignment="Stretch"
                 ItemsSource="{x:Bind ViewModel.Languages, Mode=OneTime}" 
                 SelectedItem="{x:Bind ViewModel.Language, Mode=TwoWay}" 
                 DisplayMemberPath="Name"
+                Margin="16,0"
                 Width="320">
             </ComboBox>
             <ComboBox
-                Grid.Column="1"
+                Grid.Column="2"
                 ItemsSource="{x:Bind ViewModel.Speeds, Mode=OneTime}"
                 SelectedItem="{x:Bind ViewModel.Speed, Mode=TwoWay}" 
                 DisplayMemberPath="Label"
-                Margin="16,0"
                 Width="100">
             </ComboBox>
             <ToggleSwitch 
-                Grid.Column="2"
+                Grid.Column="3"
                 IsOn="{x:Bind ViewModel.AutoPause, Mode=TwoWay, Converter={StaticResource NullableBooleanToBooleanConverter}}"
                 OnContent="Auto-Pause" 
                 OffContent="Auto-Pause"
-                Margin="4,0">
+                Margin="16,0">
             </ToggleSwitch>
         </Grid>
         <!-- network notification -->
