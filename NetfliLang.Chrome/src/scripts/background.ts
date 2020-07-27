@@ -9,19 +9,25 @@ chrome.runtime.onInstalled.addListener(() => {
     // Component messages
     if (Action.componentCreated === m.action) {
       // Pre-load translator
-      getOrCreateTab(Constants.translatorUrl);
+      // TODO: This does not usually work because without mouse movement
+      // the component is created.
+      getOrCreateTab(Constants.translatorUrl, { currentWindow: true })
+        .then()
+        .catch();
     }
     // Translator messages
     if ([Action.translate].includes(m.action)) {
       // Pass messages to translator tab
-      getOrCreateTab(Constants.translatorUrl).then((tab) => {
-        chrome.tabs.sendMessage(tab.id, m);
-      });
+      getOrCreateTab(Constants.translatorUrl, { currentWindow: true })
+        .then((tab) => {
+          chrome.tabs.sendMessage(tab.id, m);
+        })
+        .catch();
     }
     // Netflix messages
     else if ([Action.translated].includes(m.action)) {
       // Pass messages to active netflix tab
-      getTab(Constants.netflixUrl, { active: true })
+      getTab(Constants.netflixUrl, { active: true, currentWindow: true })
         .then((tab) => {
           chrome.tabs.sendMessage(tab.id, m);
         })
