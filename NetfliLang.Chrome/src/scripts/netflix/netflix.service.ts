@@ -206,7 +206,7 @@ export class NetflixService extends INetflixService {
       // Lines are joined with special characters to keep semantics and line breaks.
       const key = subtitle.lines.join(' ||| ');
       fetch(
-        `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=cs`,
+        `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${this.store.state.language.id}`,
         {
           method: 'POST',
           headers: {
