@@ -92,12 +92,19 @@ export const getTab = (
 };
 
 // Gets tab based on url matcher and creates new innactive tab if none found.
-export const getOrCreateTab = (url: string): Promise<chrome.tabs.Tab> => {
+export const getOrCreateTab = (
+  url: string,
+  queryInfo?: chrome.tabs.QueryInfo,
+  createProperties?: chrome.tabs.CreateProperties
+): Promise<chrome.tabs.Tab> => {
   return new Promise((resolve) => {
-    getTab(url)
+    getTab(url, queryInfo)
       .then((tab) => resolve(tab))
       .catch(() => {
-        chrome.tabs.create({ url: url, active: false }, (tab) => resolve(tab));
+        chrome.tabs.create(
+          { url: url, active: false, ...createProperties },
+          (tab) => resolve(tab)
+        );
       });
   });
 };
