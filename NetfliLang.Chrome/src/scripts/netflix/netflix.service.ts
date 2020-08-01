@@ -6,7 +6,7 @@ import {
   injectElement,
   injectWebAccessibleResource,
 } from '../shared/extension-helpers';
-import { Action, TranslatePayload } from 'src/shared/actions';
+import { Action, TranslatedPayload } from 'src/shared/actions';
 
 export interface INetflixServiceState {
   subtitles: ISubtitles;
@@ -204,9 +204,26 @@ export class NetflixService extends INetflixService {
   protected translateSubtitle(subtitle: ISubtitle): void {
     if (!subtitle.translations) {
       // Lines are joined with special characters to keep semantics and line breaks.
-      sendMessage<TranslatePayload>(Action.translate, {
-        value: subtitle.lines.join(' ||| '),
-      });
+      const key = subtitle.lines.join(' ||| ');
+      fetch(
+        `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=cs`,
+        {
+          method: 'POST',
+          headers: {
+            'Ocp-Apim-Subscription-Key': '9cdfeccee2f54e01a238bf9e06f98ece',
+            'Ocp-Apim-Subscription-Region': 'westeurope',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify([{ text: key }]),
+        }
+      ).then((r) =>
+        r.json().then((data) => {
+          sendMessage<TranslatedPayload>(Action.translated, {
+            value: key,
+            translation: data[0]?.translations[0]?.text,
+          });
+        })
+      );
     }
   }
 
