@@ -2,11 +2,9 @@ import { ISubtitles, ISubtitle, ILanguage } from 'src/shared/interfaces';
 import { MutationObserverService } from '../shared/mutation-observer.service';
 import { Store } from '../shared/store';
 import {
-  sendMessage,
   injectElement,
   injectWebAccessibleResource,
 } from '../shared/extension-helpers';
-import { Action, TranslatedPayload } from 'src/shared/actions';
 
 export interface INetflixServiceState {
   subtitles: ISubtitles;
@@ -206,7 +204,9 @@ export class NetflixService extends INetflixService {
       // Lines are joined with special characters to keep semantics and line breaks.
       const key = subtitle.lines.join(' ||| ');
       fetch(
-        `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${this.store.state.language.id}`,
+        `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${
+          this.store.state.language?.id || 'en'
+        }`,
         {
           method: 'POST',
           headers: {
@@ -218,10 +218,7 @@ export class NetflixService extends INetflixService {
         }
       ).then((r) =>
         r.json().then((data) => {
-          sendMessage<TranslatedPayload>(Action.translated, {
-            value: key,
-            translation: data[0]?.translations[0]?.text,
-          });
+          this.translationReceived(key, data[0]?.translations[0]?.text);
         })
       );
     }
